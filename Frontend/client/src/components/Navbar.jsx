@@ -30,7 +30,7 @@ const Navbar = () => {
       className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 md:px-16 lg:px-24 xl:px-32 transition-all duration-500 ${
         isScrolled
           ? "bg-white/80 backdrop-blur-lg shadow-md text-gray-700 py-3 md:py-4"
-          : "bg-indigo-500 py-4 md:py-6"
+          : "bg-transparent py-4 md:py-6"
       }`}
     >
       {/* Logo */}
@@ -89,11 +89,11 @@ const Navbar = () => {
 
       {/* Mobile Menu Button */}
       <div className="md:hidden">
-        <img onClick={() => setIsMenuOpen(!isMenuOpen)}
+        <img
           src={assets.menuIcon}
           alt="Menu"
           className={`h-5 cursor-pointer ${isScrolled ? "invert" : ""}`}
-          onClick={() => setIsMenuOpen(true)}
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
         />
       </div>
 
