@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { assets } from "../assets/assets";
+import { useClerk, useUser, UserButton } from "@clerk/react";
 
 const Navbar = () => {
   const navLinks = [
@@ -12,6 +13,9 @@ const Navbar = () => {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const {openSignIn} = useClerk();
+  const {user} = useUser();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -78,7 +82,7 @@ const Navbar = () => {
           className={`h-7 ${isScrolled ? "invert" : ""}`}
         />
 
-        <button
+        <button onClick={openSignIn}
           className={`ml-4 rounded-full px-8 py-2.5 ${
             isScrolled ? "bg-black text-white" : "bg-white text-black"
           }`}
@@ -122,7 +126,7 @@ const Navbar = () => {
 
         <button className="border rounded-full px-4 py-1">Dashboard</button>
 
-        <button className="rounded-full bg-black px-8 py-2.5 text-white">
+        <button onClick={openSignIn} className="rounded-full bg-black px-8 py-2.5 text-white">
           Login
         </button>
       </div>
