@@ -68,13 +68,11 @@ const Navbar = () => {
         }`}
     >
       {/* Logo */}
-      <Link to="/">
-        <img
-          src={assets.logo}
-          alt="Logo"
-          className={`h-9 ${isScrolled ? "invert opacity-80" : ""}`}
-        />
-      </Link>
+      <img
+        src={assets.Bookmystaylogo}
+        alt="Logo"
+        className={`h-14 w-auto ${isScrolled ? "invert opacity-80" : ""}`}
+      />
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex items-center gap-4 lg:gap-8">
