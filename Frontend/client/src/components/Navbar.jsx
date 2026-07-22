@@ -99,7 +99,7 @@ const Navbar = () => {
           className={`border rounded-full px-4 py-1 text-sm ${
             isScrolled ? "text-black" : "text-white"
           }`}
-          onclick={() => navigate("/owner")}
+          onClick={() => navigate("/owner")}
         >
           Dashboard
         </button>
