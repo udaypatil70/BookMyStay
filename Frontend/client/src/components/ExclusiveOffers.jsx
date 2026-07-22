@@ -12,17 +12,17 @@ const ExclusiveOffers = () => {
           title="Exclusive Offers"
           subtitle="Take Advantage of our limited-time offers and special package to enhance your stay and create unforgettable memories"
         />
-        <button className="group flex item-center gap-2 font-medium cursor-pointer max-md:mt-12">
-          View All Offers
+        <button className="group flex items-center gap-2 font-medium cursor-pointer whitespace-nowrap">
+          <span>View All Offers</span>
           <img
             src={assets.arrowIcon}
-            alt="Arrow-Icon"
-            className="group-hover:translate-x-1 transition-all"
+            alt="Arrow Icon"
+            className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1"
           />
         </button>
       </div>
 
-      <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12 w-full">
         {exclusiveOffers.map((item) => (
           <div
             key={item._id}
