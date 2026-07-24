@@ -1,5 +1,5 @@
 import React from "react";
-import { assets } from "../assets/assets";
+import { assets, cities } from "../assets/assets";
 
 const HotelRegistration = () => {
   return (
