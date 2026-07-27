@@ -1,15 +1,26 @@
-import express from 'express';
+import express from "express";
 import "dotenv/config";
 import cors from "cors";
-
+import connectDB from "./src/config/db.js";
 
 const app = express();
-app.use(cors())  // we can add with fronted
 
-app.get('/' , (req, res) => res.send("API is Working"))
+// Connect Database
+connectDB();
 
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-const PORT = process.env.PORT || 3000 ;
+// Routes
+app.get("/", (req, res) => {
+  res.send("API is Working");
+});
 
+// Port
+const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => console.log(`server is running on port ${PORT}`));
+// Start Server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
