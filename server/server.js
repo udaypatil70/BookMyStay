@@ -12,11 +12,14 @@ connectDB();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
 app.use(clerkMiddleware());
 
 // API to listen to clerk Webhooks
-app.post("/api/clerk", clerkWebhooks);
+app.post(
+  "/api/clerk",
+  express.raw({ type: "application/json" }),
+  clerkWebhooks,
+);
 
 // Routes
 app.get("/", (req, res) => {

@@ -11,10 +11,11 @@ const clerkWebhooks = async (req, res) => {
       "svix-signature": req.headers["svix-signature"],
     };
 
-    // Verify webhook
-    whook.verify(JSON.stringify(req.body), headers);
-
-    const { data, type } = req.body;
+    const rawBody = Buffer.isBuffer(req.body)
+      ? req.body.toString("utf8")
+      : JSON.stringify(req.body);
+    const evt = whook.verify(rawBody, headers);
+    const { data, type } = evt;
 
     console.log("Webhook Event:", type);
 
@@ -34,11 +35,15 @@ const clerkWebhooks = async (req, res) => {
       case "user.updated": {
         const userData = {
           email: data.email_addresses?.[0]?.email_address,
-          username: `${data.first_name || ""} ${data.last_name || ""}`.trim(),
+          username:
+            `${data.first_name || ""} ${data.first_name || ""} ${data.last_name || ""}`.trim(),
           image: data.image_url,
         };
 
-        await User.findByIdAndUpdate(data.id, userData);
+        await User.findByIdAndUpdate(data.id, userData, {
+          new: true,
+          upsert: true,
+        });
         break;
       }
 
