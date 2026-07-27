@@ -2,6 +2,7 @@ import express from "express";
 import "dotenv/config";
 import cors from "cors";
 import connectDB from "./src/config/db.js";
+import { clerkMiddleware } from '@clerk/express';
 
 const app = express();
 
@@ -11,6 +12,9 @@ connectDB();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(clerkMiddleware())
+
+
 
 // Routes
 app.get("/", (req, res) => {
