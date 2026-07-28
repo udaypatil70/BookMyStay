@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDB from "./src/config/db.js";
 import { clerkMiddleware } from "@clerk/express";
 import clerkWebhooks from "./src/controllers/clerkWebhooks.controllers.js";
+import userRouter from "./src/routes/user.routes.js"
 
 const app = express();
 
@@ -25,6 +26,8 @@ app.post(
 app.get("/", (req, res) => {
   res.send("API is Working");
 });
+
+app.use(".api/user", userRouter)
 
 // Port
 const PORT = process.env.PORT || 3000;

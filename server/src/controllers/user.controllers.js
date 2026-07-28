@@ -1,0 +1,57 @@
+const getUserData = async (req, res) => {
+  try {
+    const { role, recentSearchedCities } = req.user;
+
+    return res.status(200).json({
+      success: true,
+      role,
+      recentSearchedCities,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const storeRecentSearchedCities = async (req, res) => {
+  try {
+    const { recentSearchedCity } = req.body;
+
+    if (!recentSearchedCity) {
+      return res.status(400).json({
+        success: false,
+        message: "Recent searched city is required",
+      });
+    }
+
+    const user = req.user;
+
+    // Remove duplicate if it already exists
+    user.recentSearchedCities = user.recentSearchedCities.filter(
+      (city) => city !== recentSearchedCity,
+    );
+
+    // Keep only the latest 3 cities
+    if (user.recentSearchedCities.length >= 3) {
+      user.recentSearchedCities.shift();
+    }
+
+    user.recentSearchedCities.push(recentSearchedCity);
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "City added successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export { getUserData, storeRecentSearchedCities };
