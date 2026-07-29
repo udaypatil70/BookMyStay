@@ -1,6 +1,6 @@
 import express from "express";
 import {protect} from "../middleware/auth.middleware.js"
-import { checkAvailabilityAPI, createBooking, getHotelBookings, getUserBookings } from "../controllers/booking.controllers";
+import { checkAvailabilityAPI, createBooking, getHotelBookings, getUserBookings } from "../controllers/booking.controllers.js";
 
 const bookingRouter = express.Router();
 

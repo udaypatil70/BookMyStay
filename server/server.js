@@ -10,6 +10,7 @@ import connectCloudinary from "./src/config/cloudinary.config.js"
 import roomRouter from "./src/routes/room.routes.js";
 import bookingRouter from "./src/routes/booking.routes.js";
 
+
 const app = express();
 
 // Connect Database
