@@ -14,88 +14,82 @@ const DashBoard = () => {
         subtitle="Monitor your room listings, track bookings and analyze revenue—all in one place. Stay updated with real-time insights to ensure smooth operations."
       />
 
-      <div className="flex gap-4 my-8">
-        {/* ----- Total Bookings-- */}
-        <div className="bg-primary/3 border border-primary/10 rounded flex p-4 pr-8">
+      <div className="grid gap-6 my-8 md:grid-cols-2">
+        <div className="bg-white rounded-[28px] shadow-sm p-6 flex items-center gap-4">
           <img
             src={assets.totalBookingIcon}
-            alt=""
-            className="max-sm:hidden h-10"
+            alt="Bookings"
+            className="h-12 w-12"
           />
-
-          <div className="flex flex-col sm:ml-4 font-medium">
-            <p className="text-blue-500 text-lg">Total Bookings</p>
-            <p className="text-neutral-400 text-base">
+          <div>
+            <p className="text-sm text-slate-500 uppercase tracking-[0.2em]">
+              Total Bookings
+            </p>
+            <p className="text-3xl font-semibold text-slate-900 mt-2">
               {dashBordData.totalBookings}
             </p>
           </div>
         </div>
 
-        {/* ------- Total Revenue ------- */}
-        <div className="bg-primary/3 border border-primary/10 rounded flex p-4 pr-8">
+        <div className="bg-white rounded-[28px] shadow-sm p-6 flex items-center gap-4">
           <img
             src={assets.totalRevenueIcon}
-            alt=""
-            className="max-sm:hidden h-10"
+            alt="Revenue"
+            className="h-12 w-12"
           />
-
-          <div className="flex flex-col sm:ml-4 font-medium">
-            <p className="text-blue-500 text-lg">Total Revenue</p>
-            <p className="text-neutral-400 text-base">
+          <div>
+            <p className="text-sm text-slate-500 uppercase tracking-[0.2em]">
+              Total Revenue
+            </p>
+            <p className="text-3xl font-semibold text-slate-900 mt-2">
               $ {dashBordData.totalRevenue}
             </p>
           </div>
         </div>
       </div>
 
-      {/* ----- Recent Bookings-- */}
-      <h2 className="text-xl text-blue-950/70 font-medium mb-5">
-        Recent Bookings
-      </h2>
+      <div className="bg-white rounded-[28px] shadow-sm p-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-semibold text-slate-900">
+              Recent Bookings
+            </h2>
+            <p className="text-sm text-slate-500 mt-1">
+              A quick view of recent activity and payment status for your rooms.
+            </p>
+          </div>
+        </div>
 
-      <div className="w-full max-w-3xl text-left border border-gray-300 rounded-lg max-h-80 overflow-y-scroll">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="py-3 py-4 text-gray-800 font-medium">User Name</th>
-              <th className="py-3 py-4 text-gray-800 font-medium max-sm:hidden">
-                Room Name
-              </th>
-              <th className="py-3 py-4 text-gray-800 font-medium text-center">
-                Total Amount
-              </th>
-              <th className="py-3 py-4 text-gray-800 font-medium text-center">
-                Payment Status
-              </th>
-            </tr>
-          </thead>
-
-          <tbody className="text-sm">
-            {dashBordData.bookings.map((item, index) => (
-              <tr key={index}>
-                <td className="py-3 px-4 text-gray-700 border-t border-gray-300">
-                  {item.user.username}
-                </td>
-
-                <td className="py-3 px-4 text-gray-700 border-t border-gray-300 mx-sm:hidden">
-                  {item.room.roomType}
-                </td>
-
-                <td className="py-3 px-4 text-gray-700 border-t border-gray-300 text-center">
-                  $ {item.totalPrice}
-                </td>
-
-                <td className="py-3 px-4 border-t border-gray-300 flex">
-                  <button
-                    className={`py-1 px-4 text-xs rounded-full mx-auto ${item.isPaid ? "bg-green-200 text-green-600" : "bg-amber-200 text-yellow-600"}`}
-                  >
-                    {item.isPaid ? "Completed" : "Pending"}
-                  </button>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] text-left">
+            <thead>
+              <tr className="text-sm text-slate-500 uppercase tracking-[0.1em]">
+                <th className="py-4 px-4">User Name</th>
+                <th className="py-4 px-4 hidden sm:table-cell">Room Name</th>
+                <th className="py-4 px-4 text-center">Total Amount</th>
+                <th className="py-4 px-4 text-center">Payment Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="text-sm text-slate-700">
+              {dashBordData.bookings.map((item, index) => (
+                <tr key={index} className="border-t border-slate-200">
+                  <td className="py-4 px-4">{item.user.username}</td>
+                  <td className="py-4 px-4 hidden sm:table-cell">
+                    {item.room.roomType}
+                  </td>
+                  <td className="py-4 px-4 text-center">$ {item.totalPrice}</td>
+                  <td className="py-4 px-4 text-center">
+                    <span
+                      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${item.isPaid ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}
+                    >
+                      {item.isPaid ? "Completed" : "Pending"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

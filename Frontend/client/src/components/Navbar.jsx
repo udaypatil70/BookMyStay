@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { assets } from "../assets/assets";
-import { useClerk, useUser, UserButton } from "@clerk/react";
+import { useClerk, UserButton } from "@clerk/react";
+import { useAppContext } from "../context/AppContext";
 
 const BookIcon = () => (
   <svg
@@ -36,21 +37,21 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const { openSignIn } = useClerk();
-  const { user } = useUser();
-  const navigate = useNavigate();
   const location = useLocation();
+
+  const { user, navigate, isOwner, setShowHotelReg } = useAppContext();
 
   useEffect(() => {
     if (location.pathname !== "/") {
       setIsScrolled(true);
       return;
-    } else {
-      setIsScrolled(false);
     }
-    setIsScrolled((prev) => (location.pathname !== "/" ? true : prev));
+
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
+
+    handleScroll();
 
     window.addEventListener("scroll", handleScroll);
 
@@ -61,19 +62,20 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 md:px-16 lg:px-24 xl:px-32 transition-all duration-500 
-        ${
-          isScrolled
-            ? "bg-white/80 backdrop-blur-lg shadow-md text-gray-700 py-3 md:py-4"
-            : "bg-transparent py-4 md:py-6"
-        }`}
+      className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 md:px-16 lg:px-24 xl:px-32 transition-all duration-500 ${
+        isScrolled
+          ? "bg-white/80 backdrop-blur-lg shadow-md text-gray-700 py-3 md:py-4"
+          : "bg-transparent py-4 md:py-6"
+      }`}
     >
       {/* Logo */}
-      <img
-        src={assets.Bookmystaylogo}
-        alt="Logo"
-        className={`h-14 w-auto ${isScrolled ? "invert opacity-80" : ""}`}
-      />
+      <Link to="/">
+        <img
+          src={assets.Bookmystaylogo}
+          alt="BookMyStay"
+          className={`h-14 w-auto ${isScrolled ? "invert opacity-80" : ""}`}
+        />
+      </Link>
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex items-center gap-4 lg:gap-8">
@@ -94,23 +96,29 @@ const Navbar = () => {
           </Link>
         ))}
 
-        <button
-          className={`border rounded-full px-4 py-1 text-sm ${
-            isScrolled ? "text-black" : "text-white"
-          }`}
-          onClick={() => navigate("/owner")}
-        >
-          Dashboard
-        </button>
+        {user && (
+          <button
+            className={`border rounded-full px-4 py-1 text-sm ${
+              isScrolled ? "text-black" : "text-white"
+            }`}
+            onClick={() =>
+              isOwner ? navigate("/owner") : setShowHotelReg(true)
+            }
+          >
+            {isOwner ? "Dashboard" : "List Your Hotel"}
+          </button>
+        )}
       </div>
 
       {/* Right Side */}
       <div className="hidden md:flex items-center gap-4">
-        <img
-          src={assets.searchIcon}
-          alt="Search"
-          className={`h-7 ${isScrolled ? "invert" : ""}`}
-        />
+        <button>
+          <img
+            src={assets.searchIcon}
+            alt="Search"
+            className={`h-7 ${isScrolled ? "invert" : ""}`}
+          />
+        </button>
 
         {user ? (
           <UserButton>
@@ -124,7 +132,7 @@ const Navbar = () => {
           </UserButton>
         ) : (
           <button
-            onClick={openSignIn}
+            onClick={() => openSignIn()}
             className={`ml-4 rounded-full px-8 py-2.5 ${
               isScrolled ? "bg-black text-white" : "bg-white text-black"
             }`}
@@ -134,8 +142,8 @@ const Navbar = () => {
         )}
       </div>
 
-      {/* Mobile Menu Button */}
-      <div className="md:hidden">
+      {/* Mobile */}
+      <div className="md:hidden flex items-center gap-4">
         {user && (
           <UserButton>
             <UserButton.MenuItems>
@@ -147,11 +155,12 @@ const Navbar = () => {
             </UserButton.MenuItems>
           </UserButton>
         )}
+
         <img
           src={assets.menuIcon}
           alt="Menu"
           className={`h-5 cursor-pointer ${isScrolled ? "invert" : ""}`}
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          onClick={() => setIsMenuOpen(true)}
         />
       </div>
 
@@ -180,16 +189,24 @@ const Navbar = () => {
 
         {user && (
           <button
-            onClick={() => navigate("/owner")}
             className="border rounded-full px-4 py-1"
+            onClick={() => {
+              setIsMenuOpen(false);
+
+              if (isOwner) {
+                navigate("/owner");
+              } else {
+                setShowHotelReg(true);
+              }
+            }}
           >
-            Dashboard
+            {isOwner ? "Dashboard" : "List Your Hotel"}
           </button>
         )}
 
         {!user && (
           <button
-            onClick={openSignIn}
+            onClick={() => openSignIn()}
             className="rounded-full bg-black px-8 py-2.5 text-white"
           >
             Login

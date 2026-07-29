@@ -23,53 +23,58 @@ const AddRoom = () => {
   });
 
   return (
-    <form>
+    <form className="space-y-8">
       <Title
         align="left"
         font="outfit"
         title="Add Room"
-        subTitle="Fill in the details carefully and accurate room details, pricing, and amenities, to enhance the user booking experience."
+        subtitle="Fill in the details carefully with accurate room information, pricing, and amenities to enhance the guest booking experience."
       />
 
-      {/* Upload Area For Images */}
-      <p className="text-gray-800 mt-10">Images</p>
-
-      <div className="grid grid-cols-2 sm:flex gap-4 my-2 flex-wrap">
-        {Object.keys(images).map((key) => (
-          <label htmlFor={`roomImage${key}`} key={key}>
-            <img
-              className="max-h-13 cursor-pointer opacity-80"
-              src={
-                images[key]
-                  ? URL.createObjectURL(images[key])
-                  : assets.uploadArea
-              }
-              alt=""
-            />
-
-            <input
-              type="file"
-              accept="image/*"
-              id={`roomImage${key}`}
-              hidden
-              onChange={(e) =>
-                setImages({
-                  ...images,
-                  [key]: e.target.files[0],
-                })
-              }
-            />
-          </label>
-        ))}
+      <div className="bg-white rounded-[28px] shadow-sm p-6">
+        <p className="text-sm font-semibold text-slate-900 mb-4">Room Images</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {Object.keys(images).map((key) => (
+            <label
+              htmlFor={`roomImage${key}`}
+              key={key}
+              className="cursor-pointer"
+            >
+              <img
+                className="h-40 w-full rounded-3xl object-cover border border-dashed border-slate-300 bg-slate-50"
+                src={
+                  images[key]
+                    ? URL.createObjectURL(images[key])
+                    : assets.uploadArea
+                }
+                alt="Room upload"
+              />
+              <input
+                type="file"
+                accept="image/*"
+                id={`roomImage${key}`}
+                hidden
+                onChange={(e) =>
+                  setImages({
+                    ...images,
+                    [key]: e.target.files[0],
+                  })
+                }
+              />
+            </label>
+          ))}
+        </div>
       </div>
 
-      <div className="w-full flex max-sm:flex-col sm:gap-4 mt-4">
-        <div className="flex-1 max-w-48">
-          <p className="text-gray-800 mt-4">Room Type</p>
+      <div className="bg-white rounded-[28px] shadow-sm p-6 grid gap-6 md:grid-cols-2">
+        <div>
+          <label className="text-sm font-semibold text-slate-900">
+            Room Type
+          </label>
           <select
             value={inputs.roomType}
             onChange={(e) => setInputs({ ...inputs, roomType: e.target.value })}
-            className="border opacity-70 border-gray-300 mt-1 rounded p-2 w-full"
+            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-700 focus:border-slate-900 outline-none"
           >
             <option value="">Select Room Type</option>
             <option value="Single Bed">Single Bed</option>
@@ -78,14 +83,15 @@ const AddRoom = () => {
             <option value="Family Suite">Family Suite</option>
           </select>
         </div>
+
         <div>
-          <p className="mt-4 text-gray-800">
-            Price <span className="text-xs">/night</span>
-          </p>
+          <label className="text-sm font-semibold text-slate-900">
+            Price per Night
+          </label>
           <input
             type="number"
             placeholder="0"
-            className="border border-gray-300 mt-1 rounded p-2 w-24"
+            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3 text-slate-700 focus:border-slate-900 outline-none"
             value={inputs.pricePerNight}
             onChange={(e) =>
               setInputs({ ...inputs, pricePerNight: e.target.value })
@@ -94,30 +100,37 @@ const AddRoom = () => {
         </div>
       </div>
 
-      <p className="text-gray-800 mt-4">Amenities</p>
-
-      <div className="flex flex-col flex-wrap mt-1 text-gray-400 max-w-sm">
-        {Object.keys(inputs.amenities).map((amenity, index) => (
-          <div key={index}>
-            <input
-              type="checkbox"
-              id={`amenities${index + 1}`}
-              checked={inputs.amenities[amenity]}
-              onChange={() =>
-                setInputs({
-                  ...inputs,
-                  amenities: {
-                    ...inputs.amenities,
-                    [amenity]: !inputs.amenities[amenity],
-                  },
-                })
-              }
-            />
-            <label htmlFor={`amenities${index + 1}`}> {amenity} </label>
-          </div>
-        ))}
+      <div className="bg-white rounded-[28px] shadow-sm p-6">
+        <p className="text-sm font-semibold text-slate-900 mb-4">Amenities</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-slate-700">
+          {Object.keys(inputs.amenities).map((amenity, index) => (
+            <label
+              key={index}
+              htmlFor={`amenities${index + 1}`}
+              className="flex items-center gap-3 rounded-2xl border border-slate-200 px-4 py-3 cursor-pointer hover:border-slate-300"
+            >
+              <input
+                type="checkbox"
+                id={`amenities${index + 1}`}
+                checked={inputs.amenities[amenity]}
+                onChange={() =>
+                  setInputs({
+                    ...inputs,
+                    amenities: {
+                      ...inputs.amenities,
+                      [amenity]: !inputs.amenities[amenity],
+                    },
+                  })
+                }
+                className="h-4 w-4 rounded border-slate-300 text-slate-900"
+              />
+              <span className="text-sm">{amenity}</span>
+            </label>
+          ))}
+        </div>
       </div>
-      <button className="bg-primary text-white px-8 py-2 rounded mt-8 cursor-pointer">
+
+      <button className="bg-slate-950 text-white px-8 py-3 rounded-full transition hover:bg-slate-800">
         Add Room
       </button>
     </form>
