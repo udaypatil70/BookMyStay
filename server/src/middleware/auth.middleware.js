@@ -1,8 +1,9 @@
-import User from "../models/user.model.js";
+import { getAuth } from "@clerk/express";
+import User from "../models/user.models.js";
 
 export const protect = async (req, res, next) => {
   try {
-    const { userId } = req.auth;
+    const { userId } = getAuth(req);
 
     if (!userId) {
       return res.status(401).json({

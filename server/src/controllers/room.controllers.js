@@ -1,5 +1,5 @@
-import Hotel from "../models/Hotel.model.js";
-import Room from "../models/Room.model.js";
+import Hotel from "../models/Hotel.models.js";
+import Room from "../models/Room.models.js";
 import { v2 as cloudinary } from "cloudinary";
 
 // API to create a new room for a hotel

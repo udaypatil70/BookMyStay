@@ -1,5 +1,5 @@
-import Hotel from "../models/Hotel.model.js";
-import User from "../models/user.model.js";
+import Hotel from "../models/Hotel.models.js";
+import User from "../models/user.models.js";
 
 const registerHotel = async (req, res) => {
   try {
