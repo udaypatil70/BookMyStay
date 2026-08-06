@@ -3,13 +3,12 @@ import "dotenv/config";
 import cors from "cors";
 import connectDB from "./src/config/db.config.js";
 import { clerkMiddleware } from "@clerk/express";
-import {clerkWebhooks} from "./src/controllers/clerkWebhooks.controllers.js";
+import clerkWebhooks from "./src/controllers/clerkWebhooks.controllers.js";
 import userRouter from "./src/routes/user.routes.js";
 import hotelRouter from "./src/routes/hotel.route.js";
-import connectCloudinary from "./src/config/cloudinary.config.js"
+import connectCloudinary from "./src/config/cloudinary.config.js";
 import roomRouter from "./src/routes/room.routes.js";
 import bookingRouter from "./src/routes/booking.routes.js";
-
 
 const app = express();
 
@@ -19,8 +18,6 @@ connectCloudinary();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
-app.use(clerkMiddleware());
 
 // API to listen to Clerk Webhooks
 app.post(
@@ -28,13 +25,14 @@ app.post(
   express.raw({ type: "application/json" }),
   clerkWebhooks,
 );
-// app.use("/api/clerk" , clerkWebhooks);
+app.use(express.json());
+app.use(clerkMiddleware());
+// app.use("/api/clerk", clerkWebhooks);
 
 // Routes
 app.get("/", (req, res) => {
   res.send("API is Working");
 });
-
 
 app.use("/api/user", userRouter);
 app.use("/api/hotels", hotelRouter);
