@@ -28,16 +28,6 @@ const roomSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    capacity: {
-      type: Number,
-      required: true,
-    },
-
-    bedType: {
-      type: String,
-      required: true,
-    },
-
     description: {
       type: String,
       default: "",
