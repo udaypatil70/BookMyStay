@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { useClerk, UserButton } from "@clerk/react";
@@ -189,15 +189,9 @@ const Navbar = () => {
 
         {user && (
           <button
-            className="border rounded-full px-4 py-1"
+            className="border rounded-full px-4 py-1 text-sm font-;ight cursor-pointer transition-all "
             onClick={() => {
-              setIsMenuOpen(false);
-
-              if (isOwner) {
-                navigate("/owner");
-              } else {
-                setShowHotelReg(true);
-              }
+              isOwner ? navigate("/owner") : setShowHotelReg(true);
             }}
           >
             {isOwner ? "Dashboard" : "List Your Hotel"}
@@ -207,7 +201,7 @@ const Navbar = () => {
         {!user && (
           <button
             onClick={() => openSignIn()}
-            className="rounded-full bg-black px-8 py-2.5 text-white"
+            className="rounded-full bg-black px-8 py-2.5 text-white transition-all duration-500"
           >
             Login
           </button>
