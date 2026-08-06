@@ -1,9 +1,40 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Title from "../../components/Title";
-import { assets, dashboardDummyData } from "../../assets/assets";
+import { assets } from "../../assets/assets";
+import { useAppContext } from "../../context/AppContext";
 
-const DashBoard = () => {
-  const [dashBordData, setDashBordData] = useState(dashboardDummyData);
+const Dashboard = () => {
+  const { currency, user, getToken, toast, axios } = useAppContext();
+
+  const [dashboardData, setDashboardData] = useState({
+    bookings: [],
+    totalBookings: 0,
+    totalRevenue: 0,
+  });
+
+  const fetchDashboardData = async () => {
+    try {
+      const { data } = await axios.get("/api/bookings/hotel", {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      });
+
+      if (data.success) {
+        setDashboardData(data.dashboardData);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchDashboardData();
+    }
+  }, [user]);
 
   return (
     <div>
@@ -26,7 +57,7 @@ const DashBoard = () => {
               Total Bookings
             </p>
             <p className="text-3xl font-semibold text-slate-900 mt-2">
-              {dashBordData.totalBookings}
+              {dashboardData.totalBookings}
             </p>
           </div>
         </div>
@@ -42,7 +73,7 @@ const DashBoard = () => {
               Total Revenue
             </p>
             <p className="text-3xl font-semibold text-slate-900 mt-2">
-              $ {dashBordData.totalRevenue}
+              {currency} {dashboardData.totalRevenue}
             </p>
           </div>
         </div>
@@ -71,13 +102,13 @@ const DashBoard = () => {
               </tr>
             </thead>
             <tbody className="text-sm text-slate-700">
-              {dashBordData.bookings.map((item, index) => (
+              {dashboardData.bookings.map((item, index) => (
                 <tr key={index} className="border-t border-slate-200">
                   <td className="py-4 px-4">{item.user.username}</td>
                   <td className="py-4 px-4 hidden sm:table-cell">
                     {item.room.roomType}
                   </td>
-                  <td className="py-4 px-4 text-center">$ {item.totalPrice}</td>
+                  <td className="py-4 px-4 text-center">{currency} {item.totalPrice}</td>
                   <td className="py-4 px-4 text-center">
                     <span
                       className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${item.isPaid ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}
@@ -95,4 +126,4 @@ const DashBoard = () => {
   );
 };
 
-export default DashBoard;
+export default Dashboard;
