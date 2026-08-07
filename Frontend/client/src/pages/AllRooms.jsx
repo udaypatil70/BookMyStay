@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from "react";
-import { assets, facilityIcons, roomsDummyData } from "../assets/assets";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useMemo } from "react";
+import { assets, facilityIcons } from "../assets/assets";
+import { useSearchParams } from "react-router-dom";
 import StarRating from "../components/StarRating";
 import { useAppContext } from "../context/AppContext";
 
@@ -33,6 +33,7 @@ const RadioButton = ({ label, selected = false, onChange = () => {} }) => {
 
 const AllRooms = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [openFilters, setOpenFilters] = useState(false);
   const { rooms, navigate, currency } = useAppContext();
   const [selectedFilters, setSelectedFilters] = useState({
     roomTypes: [],
@@ -77,7 +78,7 @@ const AllRooms = () => {
   const matchesRoomType = (room) => {
     return (
       selectedFilters.roomTypes.length === 0 ||
-      selectedFilters.roomTypes.includes(room.roomTypes)
+      selectedFilters.roomTypes.includes(room.roomType)
     );
   };
 
@@ -235,7 +236,7 @@ const AllRooms = () => {
                 label={room}
                 selected={selectedFilters.roomTypes.includes(room)}
                 onChange={(checked) =>
-                  handleFilterChanage(checked, room, "roomType")
+                  handleFilterChanage(checked, room, "roomTypes")
                 }
               />
             ))}
@@ -248,7 +249,7 @@ const AllRooms = () => {
                 label={`${currency} ${range}`}
                 selected={selectedFilters.priceRanges.includes(range)}
                 onChange={(checked) =>
-                  handleFilterChanage(checked, range, "priceRange")
+                  handleFilterChanage(checked, range, "priceRanges")
                 }
               />
             ))}
@@ -256,7 +257,12 @@ const AllRooms = () => {
           <div className="px-5 pt-5 pb-7">
             <p className="font-medium text-gray-800 pb-2">Sort By</p>
             {sortOptions.map((option, index) => (
-              <RadioButton key={index} label={option} selected={selectedSort === option} onChange={() => handleFilterChanage(option)}/>
+              <RadioButton
+                key={index}
+                label={option}
+                selected={selectedSort === option}
+                onChange={handleSortChange}
+              />
             ))}
           </div>
         </div>
