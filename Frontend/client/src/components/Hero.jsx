@@ -1,7 +1,37 @@
+import { useState } from "react";
 import heroImage from "../assets/heroImage.png";
 import { assets, cities } from "../assets/assets";
+import { useAppContext } from "../context/AppContext";
 
 const Hero = () => {
+  const { navigate, getToken, axios, setSearchedCities } = useAppContext();
+  const [destination, setDestination] = useState("");
+
+  const onSearch = async (e) => {
+    e.preventDefault();
+    navigate(`/rooms?destination=${destination}`);
+
+    // call api to save recent searched city
+    await axios.post(
+      "/api/user/store-recent-search",
+      { recentSearchedCity: destination },
+      {
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      },
+    );
+
+    // add destination to searched citiesmax 3 recent searches cities 
+    setSearchedCities((prevSearchedCities) => {
+      const updatedSearchedCities = [destination, ...prevSearchedCities];
+      if(updatedSearchedCities.length > 3){
+        updatedSearchedCities.shift();
+      }
+      return updatedSearchedCities;
+    })
+  };
+
   return (
     <div
       className="flex flex-col items-start justify-center px-6 md:px-16 lg:px-24 xl:px-32 pt-28 h-screen bg-cover bg-center bg-no-repeat text-white"
@@ -20,7 +50,10 @@ const Hero = () => {
         hotels and resorts. Start your journey today.
       </p>
 
-      <form className="mt-8 flex flex-col gap-4 rounded-xl bg-white px-6 py-4 mt-8 text-gray-600 shadow-lg md:flex-row md:items-end">
+      <form
+        onSubmit={onSearch}
+        className="mt-8 flex flex-col gap-4 rounded-xl bg-white px-6 py-4 mt-8 text-gray-600 shadow-lg md:flex-row md:items-end"
+      >
         {/* Destination */}
         <div>
           <div className="flex items-center gap-2">
@@ -29,6 +62,8 @@ const Hero = () => {
           </div>
 
           <input
+            onChange={(e) => setDestination(e.target.value)}
+            value={destination}
             list="destinations"
             id="destinationInput"
             type="text"
