@@ -1,10 +1,20 @@
 import Booking from "../models/bookings.models.js";
 import Room from "../models/Room.models.js";
 import Hotel from "../models/Hotel.models.js";
+import User from "../models/user.models.js";
 import transporter from "../config/nodemailer.config.js";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+let stripe;
+const getStripe = () => {
+  if (!stripe) {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      throw new Error("STRIPE_SECRET_KEY is not configured");
+    }
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  }
+  return stripe;
+};
 
 // Function to check room availability
 const checkAvailability = async ({ checkInDate, checkOutDate, room }) => {
@@ -332,7 +342,7 @@ const stripePaymentIntent = async (req, res) => {
     }
 
     // Create Stripe Payment Intent
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntent = await getStripe().paymentIntents.create({
       amount: Math.round(booking.totalPrice * 100), // Stripe expects amount in cents
       currency: "usd",
       metadata: {
@@ -362,7 +372,7 @@ const stripeWebhook = async (req, res) => {
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = getStripe().webhooks.constructEvent(
       req.body,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET,
@@ -392,7 +402,6 @@ const stripeWebhook = async (req, res) => {
 
       if (booking) {
         // Send payment confirmation email
-        const User = (await import("../models/user.models.js")).default;
         const userData = await User.findById(booking.user);
 
         if (userData) {
