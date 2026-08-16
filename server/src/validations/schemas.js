@@ -301,6 +301,29 @@ export const deleteRoomSchema = {
   },
 };
 
+export const approveHotelSchema = {
+  body: (data) => {
+    const errors = {};
+    if (!data.hotelId || typeof data.hotelId !== "string") {
+      errors.hotelId = "Hotel ID is required";
+    }
+    return Object.keys(errors).length > 0 ? errors : null;
+  },
+};
+
+export const rejectHotelSchema = {
+  body: (data) => {
+    const errors = {};
+    if (!data.hotelId || typeof data.hotelId !== "string") {
+      errors.hotelId = "Hotel ID is required";
+    }
+    if (!data.reason || typeof data.reason !== "string" || data.reason.trim().length < 10) {
+      errors.reason = "Rejection reason must be at least 10 characters";
+    }
+    return Object.keys(errors).length > 0 ? errors : null;
+  },
+};
+
 export const razorpayOrderSchema = {
   body: (data) => {
     const errors = {};

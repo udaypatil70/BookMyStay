@@ -8,7 +8,6 @@ axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 
 const AppContext = createContext();
 
-// Safe wrapper around Clerk's getToken that handles clipboard errors
 const safeGetToken = async (getToken) => {
   try {
     return await getToken();
@@ -26,6 +25,7 @@ export const AppProvider = ({ children }) => {
   const { getToken } = useAuth();
 
   const [isOwner, setIsOwner] = useState(false);
+  const [hotelStatus, setHotelStatus] = useState("none");
   const [showHotelReg, setShowHotelReg] = useState(false);
   const [searchedCities, setSearchedCities] = useState([]);
   const [rooms, setRooms] = useState([]);
@@ -44,6 +44,23 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const fetchHotelStatus = async (token) => {
+    try {
+      const t = token || await safeGetToken(getToken);
+      if (!t) return;
+      const { data } = await axios.get("/api/hotels/owner/details", {
+        headers: { Authorization: `Bearer ${t}` },
+      });
+      if (data.success && data.hotel) {
+        setHotelStatus(data.hotel.status || "active");
+      } else {
+        setHotelStatus("none");
+      }
+    } catch {
+      setHotelStatus("none");
+    }
+  };
+
   const fetchUser = async () => {
     if (!user) return;
 
@@ -58,9 +75,26 @@ export const AppProvider = ({ children }) => {
       });
 
       if (data.success) {
-        setIsOwner(data.role === "hotelOwner");
+        const roleIsOwner = data.role === "hotelOwner";
         setSearchedCities(data.recentSearchedCities);
         fetchFavourites(token);
+
+        if (data.role === "user") {
+          setIsOwner(false);
+          setHotelStatus("none");
+        } else {
+          const hotelData = await axios.get("/api/hotels/owner/details", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (hotelData.data.success && hotelData.data.hotel) {
+            const status = hotelData.data.hotel.status;
+            setHotelStatus(status);
+            setIsOwner(roleIsOwner && status === "active");
+          } else {
+            setHotelStatus("none");
+            setIsOwner(false);
+          }
+        }
       } else {
         setTimeout(() => {
           fetchUser();
@@ -122,11 +156,14 @@ export const AppProvider = ({ children }) => {
     axios,
     isOwner,
     setIsOwner,
+    hotelStatus,
+    setHotelStatus,
     showHotelReg,
     setShowHotelReg,
     searchedCities,
     setSearchedCities,
     fetchUser,
+    fetchHotelStatus,
     rooms,
     setRooms,
     favourites,

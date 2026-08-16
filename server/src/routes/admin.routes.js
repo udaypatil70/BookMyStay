@@ -1,5 +1,6 @@
 import express from "express";
 import { protect, adminGuard } from "../middleware/auth.middleware.js";
+import validate from "../middleware/validate.middleware.js";
 import {
   getAdminStats,
   getContacts,
@@ -10,7 +11,12 @@ import {
   getUsers,
   updateUserRole,
   getAdminHotels,
+  getPendingHotels,
+  getHotelDetails,
+  approveHotel,
+  rejectHotel,
 } from "../controllers/admin.controllers.js";
+import { approveHotelSchema, rejectHotelSchema } from "../validations/schemas.js";
 
 const adminRouter = express.Router();
 
@@ -33,6 +39,10 @@ adminRouter.get("/users", getUsers);
 adminRouter.post("/users/role", updateUserRole);
 
 // Hotel management
+adminRouter.get("/hotels/pending", getPendingHotels);
 adminRouter.get("/hotels", getAdminHotels);
+adminRouter.get("/hotels/:id", getHotelDetails);
+adminRouter.post("/hotels/approve", validate(approveHotelSchema), approveHotel);
+adminRouter.post("/hotels/reject", validate(rejectHotelSchema), rejectHotel);
 
 export default adminRouter;

@@ -48,6 +48,7 @@ const searchRooms = async (req, res) => {
         },
       },
       { $unwind: "$hotelData" },
+      { $match: { "hotelData.status": "active" } },
     ];
 
     // City filter (on joined hotel)
@@ -159,6 +160,7 @@ const searchRooms = async (req, res) => {
 const getCities = async (req, res) => {
   try {
     const cities = await Hotel.aggregate([
+      { $match: { status: "active" } },
       {
         $group: {
           _id: "$city",
@@ -221,6 +223,7 @@ const getFeaturedRooms = async (req, res) => {
     const rooms = await Room.find({ isAvailable: true })
       .populate({
         path: "hotel",
+        match: { status: "active" },
         populate: {
           path: "owner",
           select: "image",
@@ -230,9 +233,11 @@ const getFeaturedRooms = async (req, res) => {
       .limit(6)
       .lean();
 
+    const filteredRooms = rooms.filter((room) => room.hotel !== null);
+
     return res.status(200).json({
       success: true,
-      rooms,
+      rooms: filteredRooms,
     });
   } catch (error) {
     return res.status(500).json({
@@ -256,6 +261,13 @@ const getRoomById = async (req, res) => {
     }).lean();
 
     if (!room) {
+      return res.status(404).json({
+        success: false,
+        message: "Room not found",
+      });
+    }
+
+    if (room.hotel && room.hotel.status !== "active") {
       return res.status(404).json({
         success: false,
         message: "Room not found",

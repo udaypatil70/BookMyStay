@@ -13,13 +13,20 @@ import Layout from "./pages/HotelOwner/Layout";
 import DashBoard from "./pages/HotelOwner/DashBoard";
 import AddRoom from "./pages/HotelOwner/AddRoom";
 import ListRoom from "./pages/HotelOwner/ListRoom";
+import AdminLayout from "./pages/Admin/AdminLayout";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import PendingApprovals from "./pages/Admin/PendingApprovals";
+import AdminHotels from "./pages/Admin/AdminHotels";
 import {Toaster} from "react-hot-toast";
 import { useAppContext } from "./context/AppContext";
 
 function App() {
   const location = useLocation();
   const isOwnerPath = location.pathname.includes("/owner");
+  const isAdminPath = location.pathname.includes("/admin");
   const {showHotelReg} = useAppContext();
+
+  const isSystemPath = isOwnerPath || isAdminPath;
 
   return (
     <div>
@@ -40,7 +47,7 @@ function App() {
           },
         }}
       />
-      {!isOwnerPath && <Navbar />}
+      {!isSystemPath && <Navbar />}
       {showHotelReg && <HotelRegistration />}
       <div className="min-h-[70vh]">
         <Routes>
@@ -54,10 +61,15 @@ function App() {
             <Route path="add-room" element={<AddRoom />} />
             <Route path="list-room" element={<ListRoom />} />
           </Route>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="pending" element={<PendingApprovals />} />
+            <Route path="hotels" element={<AdminHotels />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
-      <Footer />
+      {!isSystemPath && <Footer />}
     </div>
   );
 }

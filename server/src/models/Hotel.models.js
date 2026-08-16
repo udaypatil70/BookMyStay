@@ -27,12 +27,28 @@ const hotelSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    status: {
+      type: String,
+      enum: ["pending", "active", "rejected"],
+      default: "pending",
+    },
+    rejectionReason: {
+      type: String,
+      default: "",
+    },
+    documents: [
+      {
+        type: String,
+      },
+    ],
   },
   { timestamps: true },
 );
 
 hotelSchema.index({ city: 1 });
-hotelSchema.index({ owner: 1 }, { unique: true });
+hotelSchema.index({ owner: 1 }, { unique: true, partialFilterExpression: { status: { $ne: "rejected" } } });
+hotelSchema.index({ status: 1, city: 1 });
+hotelSchema.index({ status: 1, createdAt: 1 });
 
 const Hotel = mongoose.model("Hotel", hotelSchema);
 

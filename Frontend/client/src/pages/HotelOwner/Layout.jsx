@@ -3,15 +3,25 @@ import Navbar from "../../components/HotelOwner/Navbar";
 import Sidebar from "../../components/HotelOwner/Sidebar";
 import { Outlet } from "react-router-dom";
 import { useAppContext } from "../../context/AppContext";
+import PendingApproval from "./PendingApproval";
 
 const Layout = () => {
-  const { isOwner, navigate } = useAppContext();
+  const { isOwner, hotelStatus, navigate } = useAppContext();
 
   useEffect(() => {
-    if (!isOwner) {
+    if (!isOwner && hotelStatus !== "pending" && hotelStatus !== "rejected") {
       navigate("/");
     }
-  }, [isOwner]);
+  }, [isOwner, hotelStatus]);
+
+  if (hotelStatus === "pending" || hotelStatus === "rejected") {
+    return (
+      <div className="flex flex-col h-screen bg-slate-50">
+        <Navbar />
+        <PendingApproval />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen bg-slate-50">

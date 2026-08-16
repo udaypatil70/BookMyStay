@@ -5,6 +5,7 @@ import User from "../models/user.models.js";
 import Contact from "../models/Contact.models.js";
 import Newsletter from "../models/Newsletter.models.js";
 import Review from "../models/Review.models.js";
+import transporter from "../config/nodemailer.config.js";
 
 // API to get admin dashboard stats
 const getAdminStats = async (req, res) => {
@@ -12,6 +13,8 @@ const getAdminStats = async (req, res) => {
     const [
       totalUsers,
       totalHotels,
+      pendingHotels,
+      rejectedHotels,
       totalRooms,
       totalBookings,
       totalReviews,
@@ -21,7 +24,9 @@ const getAdminStats = async (req, res) => {
       recentContacts,
     ] = await Promise.all([
       User.countDocuments(),
-      Hotel.countDocuments(),
+      Hotel.countDocuments({ status: "active" }),
+      Hotel.countDocuments({ status: "pending" }),
+      Hotel.countDocuments({ status: "rejected" }),
       Room.countDocuments(),
       Booking.countDocuments({ status: { $ne: "cancelled" } }),
       Review.countDocuments(),
@@ -78,6 +83,8 @@ const getAdminStats = async (req, res) => {
       stats: {
         totalUsers,
         totalHotels,
+        pendingHotels,
+        rejectedHotels,
         totalRooms,
         totalBookings,
         totalReviews,
@@ -274,9 +281,14 @@ const updateUserRole = async (req, res) => {
 // API to get all hotels (admin)
 const getAdminHotels = async (req, res) => {
   try {
-    const { page = 1, limit = 20 } = req.query;
-    const total = await Hotel.countDocuments();
-    const hotels = await Hotel.find()
+    const { page = 1, limit = 20, status } = req.query;
+    const filter = {};
+    if (status && ["pending", "active", "rejected"].includes(status)) {
+      filter.status = status;
+    }
+
+    const total = await Hotel.countDocuments(filter);
+    const hotels = await Hotel.find(filter)
       .populate("owner", "username email image")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
@@ -298,6 +310,179 @@ const getAdminHotels = async (req, res) => {
   }
 };
 
+// API to get pending hotel submissions (admin)
+const getPendingHotels = async (req, res) => {
+  try {
+    const { page = 1, limit = 20 } = req.query;
+
+    const filter = { status: "pending" };
+    const total = await Hotel.countDocuments(filter);
+    const hotels = await Hotel.find(filter)
+      .populate("owner", "username email image phone")
+      .sort({ createdAt: 1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit))
+      .lean();
+
+    return res.status(200).json({
+      success: true,
+      hotels,
+      pagination: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// API to get full hotel submission details (admin)
+const getHotelDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const hotel = await Hotel.findById(id)
+      .populate("owner", "username email image phone")
+      .lean();
+
+    if (!hotel) {
+      return res.status(404).json({ success: false, message: "Hotel not found" });
+    }
+
+    return res.status(200).json({ success: true, hotel });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// API to approve a hotel (admin)
+const approveHotel = async (req, res) => {
+  try {
+    const { hotelId } = req.body;
+
+    if (!hotelId) {
+      return res.status(400).json({ success: false, message: "Hotel ID is required" });
+    }
+
+    const hotel = await Hotel.findById(hotelId);
+    if (!hotel) {
+      return res.status(404).json({ success: false, message: "Hotel not found" });
+    }
+
+    if (hotel.status !== "pending") {
+      return res.status(400).json({ success: false, message: "Only pending hotels can be approved" });
+    }
+
+    hotel.status = "active";
+    await hotel.save();
+
+    await User.findByIdAndUpdate(hotel.owner, {
+      role: "hotelOwner",
+      isVerified: true,
+    });
+
+    try {
+      const owner = await User.findById(hotel.owner).lean();
+      if (owner?.email) {
+        await transporter.sendMail({
+          from: `"BookMyStay" <${process.env.SMTP_USER}>`,
+          to: owner.email,
+          subject: "Your Hotel Has Been Approved! – BookMyStay",
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:32px;border:1px solid #e5e7eb;border-radius:16px;">
+              <h2 style="color:#0f172a;">Congratulations, ${owner.username}!</h2>
+              <p style="color:#475569;line-height:1.7;">Your hotel <strong>${hotel.name}</strong> has been reviewed and approved by our team.</p>
+              <p style="color:#475569;line-height:1.7;">You can now log in to your Owner Dashboard and start adding rooms, managing bookings, and growing your business on BookMyStay.</p>
+              <div style="text-align:center;margin:28px 0;">
+                <a href="${process.env.FRONTEND_URL}/owner" style="display:inline-block;background:#2563eb;color:#fff;padding:12px 32px;border-radius:12px;text-decoration:none;font-weight:600;font-size:14px;">Go to Dashboard</a>
+              </div>
+              <p style="color:#94a3b8;font-size:12px;margin-top:24px;">— The BookMyStay Team</p>
+            </div>
+          `,
+        });
+      }
+    } catch {
+      // email failure is non-critical
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Hotel approved successfully",
+      hotel,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// API to reject a hotel (admin)
+const rejectHotel = async (req, res) => {
+  try {
+    const { hotelId, reason } = req.body;
+
+    if (!hotelId || !reason) {
+      return res.status(400).json({ success: false, message: "Hotel ID and rejection reason are required" });
+    }
+
+    if (reason.trim().length < 10) {
+      return res.status(400).json({ success: false, message: "Rejection reason must be at least 10 characters" });
+    }
+
+    const hotel = await Hotel.findById(hotelId);
+    if (!hotel) {
+      return res.status(404).json({ success: false, message: "Hotel not found" });
+    }
+
+    if (hotel.status !== "pending") {
+      return res.status(400).json({ success: false, message: "Only pending hotels can be rejected" });
+    }
+
+    hotel.status = "rejected";
+    hotel.rejectionReason = reason.trim();
+    await hotel.save();
+
+    try {
+      const owner = await User.findById(hotel.owner).lean();
+      if (owner?.email) {
+        await transporter.sendMail({
+          from: `"BookMyStay" <${process.env.SMTP_USER}>`,
+          to: owner.email,
+          subject: "Hotel Registration Update – BookMyStay",
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:32px;border:1px solid #e5e7eb;border-radius:16px;">
+              <h2 style="color:#0f172a;">Registration Update</h2>
+              <p style="color:#475569;line-height:1.7;">Hi ${owner.username},</p>
+              <p style="color:#475569;line-height:1.7;">Unfortunately, your hotel registration for <strong>${hotel.name}</strong> was not approved at this time.</p>
+              <div style="background:#fef2f2;padding:16px;border-radius:12px;margin:16px 0;border:1px solid #fecaca;">
+                <p style="margin:0;color:#991b1b;font-size:13px;"><strong>Reason:</strong></p>
+                <p style="margin:4px 0 0;color:#991b1b;font-size:13px;">${reason}</p>
+              </div>
+              <p style="color:#475569;line-height:1.7;">You can review the feedback, make necessary changes, and re-register your hotel. If you believe this was an error, please contact our support team.</p>
+              <div style="text-align:center;margin:28px 0;">
+                <a href="${process.env.FRONTEND_URL}" style="display:inline-block;background:#2563eb;color:#fff;padding:12px 32px;border-radius:12px;text-decoration:none;font-weight:600;font-size:14px;">Contact Support</a>
+              </div>
+              <p style="color:#94a3b8;font-size:12px;margin-top:24px;">— The BookMyStay Team</p>
+            </div>
+          `,
+        });
+      }
+    } catch {
+      // email failure is non-critical
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Hotel rejected",
+      hotel,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export {
   getAdminStats,
   getContacts,
@@ -308,4 +493,8 @@ export {
   getUsers,
   updateUserRole,
   getAdminHotels,
+  getPendingHotels,
+  getHotelDetails,
+  approveHotel,
+  rejectHotel,
 };

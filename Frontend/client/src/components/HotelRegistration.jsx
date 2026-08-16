@@ -4,12 +4,13 @@ import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
 
 const HotelRegistration = () => {
-  const { setShowHotelReg, axios, getToken, setIsOwner } = useAppContext();
+  const { setShowHotelReg, axios, getToken, setHotelStatus } = useAppContext();
 
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [contact, setContact] = useState("");
   const [city, setCity] = useState("");
+  const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const onSubmitHandler = async (event) => {
@@ -24,24 +25,26 @@ const HotelRegistration = () => {
         return;
       }
 
-      const { data } = await axios.post(
-        `/api/hotels`,
-        {
-          name,
-          contact,
-          address,
-          city,
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("contact", contact);
+      formData.append("address", address);
+      formData.append("city", city);
+
+      documents.forEach((doc) => {
+        formData.append("documents", doc);
+      });
+
+      const { data } = await axios.post(`/api/hotels`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      });
 
       if (data.success) {
         toast.success(data.message);
-        setIsOwner(true);
+        setHotelStatus("pending");
         setShowHotelReg(false);
       } else {
         toast.error(data.message);
@@ -54,6 +57,10 @@ const HotelRegistration = () => {
     }
   };
 
+  const removeDocument = (index) => {
+    setDocuments((prev) => prev.filter((_, i) => i !== index));
+  };
+
   return (
     <div
       onClick={() => setShowHotelReg(false)}
@@ -62,7 +69,7 @@ const HotelRegistration = () => {
       <form
         onSubmit={onSubmitHandler}
         onClick={(e) => e.stopPropagation()}
-        className="flex bg-white rounded-2xl max-w-4xl max-md:mx-2 shadow-2xl"
+        className="flex bg-white rounded-2xl max-w-4xl max-md:mx-2 shadow-2xl max-h-[90vh] overflow-y-auto"
       >
         <img
           src={assets.regImage}
@@ -79,7 +86,7 @@ const HotelRegistration = () => {
           />
 
           <p className="text-2xl font-semibold mt-6">Register Your Hotel</p>
-          <p className="text-sm text-gray-400 mt-1">Start listing your property</p>
+          <p className="text-sm text-gray-400 mt-1">Submit details for admin review</p>
 
           {/* Hotel Name */}
           <div className="w-full mt-5">
@@ -152,6 +159,58 @@ const HotelRegistration = () => {
             </select>
           </div>
 
+          {/* Document Upload */}
+          <div className="w-full mt-5">
+            <label className="font-medium text-gray-500 text-sm">
+              Ownership Documents
+            </label>
+            <p className="text-xs text-gray-400 mt-0.5 mb-2">
+              Upload proof of ownership (license, registration, etc.)
+            </p>
+            <label className="flex items-center justify-center w-full h-24 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/30 transition-all">
+              <div className="flex flex-col items-center gap-1">
+                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <span className="text-xs text-gray-400">Tap to upload files</span>
+              </div>
+              <input
+                type="file"
+                multiple
+                accept="image/*,.pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const newFiles = Array.from(e.target.files);
+                  setDocuments((prev) => [...prev, ...newFiles].slice(0, 5));
+                  e.target.value = "";
+                }}
+              />
+            </label>
+            {documents.length > 0 && (
+              <div className="mt-2 space-y-1.5">
+                {documents.map((doc, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2"
+                  >
+                    <span className="text-xs text-gray-600 truncate max-w-[200px]">
+                      {doc.name}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeDocument(index)}
+                      className="text-red-400 hover:text-red-600 ml-2 shrink-0"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -163,10 +222,10 @@ const HotelRegistration = () => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
-                Registering...
+                Submitting...
               </>
             ) : (
-              "Register"
+              "Submit for Review"
             )}
           </button>
         </div>

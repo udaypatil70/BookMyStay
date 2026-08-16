@@ -3,19 +3,25 @@ import Room from "../models/Room.models.js";
 import Booking from "../models/bookings.models.js";
 import { v2 as cloudinary } from "cloudinary";
 
+const findOwnerHotel = async (ownerId) => {
+  const hotel = await Hotel.findOne({ owner: ownerId });
+  if (!hotel) return { hotel: null, error: "No hotel found" };
+  if (hotel.status !== "active") {
+    return { hotel: null, error: "Your hotel is pending admin approval. Room management is locked until approved." };
+  }
+  return { hotel, error: null };
+};
+
 // API to create a new room for a hotel
 const createRoom = async (req, res) => {
   try {
     const { roomType, pricePerNight, amenities } = req.body;
 
-    const hotel = await Hotel.findOne({
-      owner: req.user._id,
-    });
-
+    const { hotel, error } = await findOwnerHotel(req.user._id);
     if (!hotel) {
       return res.status(404).json({
         success: false,
-        message: "No hotel found",
+        message: error,
       });
     }
 
@@ -58,10 +64,11 @@ const getRooms = async (req, res) => {
   try {
     const { checkInDate, checkOutDate } = req.query;
 
-    // Base query: only available rooms
+    // Base query: only available rooms in active hotels
     const rooms = await Room.find({ isAvailable: true })
       .populate({
         path: "hotel",
+        match: { status: "active" },
         populate: {
           path: "owner",
           select: "image",
@@ -69,6 +76,8 @@ const getRooms = async (req, res) => {
       })
       .sort({ createdAt: -1 })
       .lean();
+
+    const filteredRooms = rooms.filter((room) => room.hotel !== null);
 
     // If dates are provided, filter out rooms that are booked for those dates
     if (checkInDate && checkOutDate) {
@@ -78,7 +87,7 @@ const getRooms = async (req, res) => {
         checkOutDate: { $gte: new Date(checkInDate) },
       });
 
-      const availableRooms = rooms.filter(
+      const availableRooms = filteredRooms.filter(
         (room) => !bookedRoomIds.some((id) => id.toString() === room._id.toString()),
       );
 
@@ -90,7 +99,7 @@ const getRooms = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      rooms,
+      rooms: filteredRooms,
     });
   } catch (error) {
     return res.status(500).json({
@@ -103,19 +112,16 @@ const getRooms = async (req, res) => {
 // API to get all rooms for a specific hotel
 const getOwnerRooms = async (req, res) => {
   try {
-    const hotelData = await Hotel.findOne({
-      owner: req.user._id,
-    });
-
-    if (!hotelData) {
+    const { hotel, error } = await findOwnerHotel(req.user._id);
+    if (!hotel) {
       return res.status(404).json({
         success: false,
-        message: "Hotel not found",
+        message: error,
       });
     }
 
     const rooms = await Room.find({
-      hotel: hotelData._id,
+      hotel: hotel._id,
     }).populate("hotel").lean();
 
     return res.status(200).json({
@@ -145,11 +151,11 @@ const toggleRoomAvailability = async (req, res) => {
     }
 
     // Verify the room belongs to the owner's hotel
-    const hotel = await Hotel.findOne({ owner: req.user._id });
+    const { hotel, error } = await findOwnerHotel(req.user._id);
     if (!hotel || roomData.hotel.toString() !== hotel._id.toString()) {
       return res.status(403).json({
         success: false,
-        message: "Not authorized to modify this room",
+        message: error || "Not authorized to modify this room",
       });
     }
 
@@ -183,9 +189,9 @@ const updateRoom = async (req, res) => {
       return res.status(404).json({ success: false, message: "Room not found" });
     }
 
-    const hotel = await Hotel.findOne({ owner: req.user._id });
+    const { hotel, error } = await findOwnerHotel(req.user._id);
     if (!hotel || roomData.hotel.toString() !== hotel._id.toString()) {
-      return res.status(403).json({ success: false, message: "Not authorized to modify this room" });
+      return res.status(403).json({ success: false, message: error || "Not authorized to modify this room" });
     }
 
     if (roomType) roomData.roomType = roomType;
@@ -233,9 +239,9 @@ const deleteRoom = async (req, res) => {
       return res.status(404).json({ success: false, message: "Room not found" });
     }
 
-    const hotel = await Hotel.findOne({ owner: req.user._id });
+    const { hotel, error } = await findOwnerHotel(req.user._id);
     if (!hotel || roomData.hotel.toString() !== hotel._id.toString()) {
-      return res.status(403).json({ success: false, message: "Not authorized to delete this room" });
+      return res.status(403).json({ success: false, message: error || "Not authorized to delete this room" });
     }
 
     const activeBooking = await Booking.findOne({
@@ -276,9 +282,9 @@ const removeRoomImage = async (req, res) => {
       return res.status(404).json({ success: false, message: "Room not found" });
     }
 
-    const hotel = await Hotel.findOne({ owner: req.user._id });
+    const { hotel, error } = await findOwnerHotel(req.user._id);
     if (!hotel || roomData.hotel.toString() !== hotel._id.toString()) {
-      return res.status(403).json({ success: false, message: "Not authorized" });
+      return res.status(403).json({ success: false, message: error || "Not authorized" });
     }
 
     if (roomData.images.length <= 1) {
