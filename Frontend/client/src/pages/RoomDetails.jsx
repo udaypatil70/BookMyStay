@@ -169,11 +169,8 @@ const RoomDetails = () => {
         <div className="flex flex-col md:flex-row items-start md:items-center gap-2 animate-fade-in-up">
           <h1 className="text-3xl md:text-4xl font-playfair">
             {room.hotel.name}
-            <span className="font-inter text-sm"> ({room.roomType})</span>
+            <span className="text-sm"> ({room.roomType})</span>
           </h1>
-          <p className="text-xs font-inter py-1.5 px-3 text-white bg-orange-500 rounded-full animate-pulse-glow">
-            20% OFF
-          </p>
           <button
             onClick={handleFavourite}
             className="ml-auto w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:bg-red-50 btn-press"
@@ -320,7 +317,7 @@ const RoomDetails = () => {
 
           <button
             type="submit"
-            className="bg-primary hover:bg-primary-dull active:scale-95 transition-all duration-300 text-white rounded-md max-md:w-full max-md:mt-6 md:px-25 py-3 md:py-4 text-base cursor-pointer hover:shadow-lg hover:shadow-primary/30 btn-press"
+            className="bg-primary hover:bg-blue-700 active:scale-95 transition-all duration-300 text-white rounded-md max-md:w-full max-md:mt-6 md:px-25 py-3 md:py-4 text-base cursor-pointer hover:shadow-lg hover:shadow-primary/30 btn-press"
           >
             {isAvailable ? "Book Now" : "Check Availability"}
           </button>
@@ -460,7 +457,7 @@ const RoomDetails = () => {
                 <button
                   type="submit"
                   disabled={reviewLoading}
-                  className="bg-primary hover:bg-primary-dull text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 btn-press disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center gap-2"
+                  className="bg-primary hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 btn-press disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center gap-2"
                 >
                   {reviewLoading ? (
                     <>
@@ -495,7 +492,10 @@ const RoomDetails = () => {
               </div>
             </div>
           </div>
-          <button className="px-6 py-2.5 mt-4 rounded text-white bg-primary hover:bg-primary-dull transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary/30 btn-press">
+          <button
+            onClick={() => { navigate("/contact"); scrollTo(0, 0); }}
+            className="px-6 py-2.5 mt-4 rounded text-white bg-primary hover:bg-blue-700 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary/30 btn-press"
+          >
             Contact Now
           </button>
         </div>

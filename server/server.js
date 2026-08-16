@@ -16,7 +16,6 @@ import reviewRouter from "./src/routes/review.routes.js";
 import publicRouter from "./src/routes/public.routes.js";
 import searchRouter from "./src/routes/search.routes.js";
 import adminRouter from "./src/routes/admin.routes.js";
-import { stripeWebhook } from "./src/controllers/booking.controllers.js";
 
 const app = express();
 
@@ -85,13 +84,6 @@ app.use(
 // Body size limits — prevent memory abuse
 const JSON_LIMIT = "1mb";
 const RAW_LIMIT = "5mb";
-
-// Stripe Webhook (must be before express.json — needs raw body)
-app.post(
-  "/api/bookings/stripe-webhook",
-  express.raw({ type: "application/json", limit: RAW_LIMIT }),
-  stripeWebhook,
-);
 
 // Clerk Webhook (needs raw body)
 app.post(

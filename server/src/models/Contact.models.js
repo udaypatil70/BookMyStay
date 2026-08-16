@@ -15,10 +15,22 @@ const contactSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    subject: {
+    phone: {
       type: String,
       trim: true,
-      default: "General Enquiry",
+      default: "",
+    },
+    checkInDate: {
+      type: String,
+      default: "",
+    },
+    checkOutDate: {
+      type: String,
+      default: "",
+    },
+    guests: {
+      type: Number,
+      default: 1,
     },
     message: {
       type: String,

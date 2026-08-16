@@ -1,13 +1,23 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Title from "../components/Title";
 import { assets } from "../assets/assets";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
-import { loadStripe } from "@stripe/stripe-js";
 
-const stripePromise = loadStripe(
-  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "",
-);
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
 
 const MyBooking = () => {
   const { axios, getToken, user, currency } = useAppContext();
@@ -61,11 +71,17 @@ const MyBooking = () => {
     }
   };
 
-  // Stripe payment
+  // Razorpay payment
   const handlePayment = async (bookingId) => {
     try {
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        toast.error("Failed to load payment SDK. Please try again.");
+        return;
+      }
+
       const { data } = await axios.post(
-        "/api/bookings/create-payment-intent",
+        "/api/bookings/create-razorpay-order",
         { bookingId },
         {
           headers: {
@@ -79,29 +95,59 @@ const MyBooking = () => {
         return;
       }
 
-      const stripe = await stripePromise;
-      const { error } = await stripe.redirectToCheckout({
-        lineItems: [
-          {
-            price_data: {
-              currency: "usd",
-              product_data: {
-                name: "Hotel Booking Payment",
-                description: `Booking ID: ${bookingId}`,
+      const options = {
+        key: data.keyId,
+        amount: data.amount * 100,
+        currency: data.currency,
+        name: "BookMyStay",
+        description: `Booking Payment`,
+        order_id: data.orderId,
+        handler: async function (response) {
+          try {
+            const { data: verifyData } = await axios.post(
+              "/api/bookings/verify-payment",
+              {
+                bookingId,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
               },
-              unit_amount: Math.round(data.amount * 100),
-            },
-            quantity: 1,
-          },
-        ],
-        mode: "payment",
-        successUrl: `${window.location.origin}/my-bookings?payment=success`,
-        cancelUrl: `${window.location.origin}/my-bookings?payment=cancelled`,
-      });
+              {
+                headers: {
+                  Authorization: `Bearer ${await getToken()}`,
+                },
+              },
+            );
 
-      if (error) {
-        toast.error(error.message);
-      }
+            if (verifyData.success) {
+              toast.success("Payment successful! Booking confirmed.");
+              fetchUserBookings();
+            } else {
+              toast.error(verifyData.message);
+            }
+          } catch (error) {
+            toast.error("Payment verification failed. Contact support.");
+          }
+        },
+        prefill: {
+          name: user?.username || "",
+          email: user?.email || "",
+        },
+        theme: {
+          color: "#1a1a1a",
+        },
+        modal: {
+          ondismiss: function () {
+            toast("Payment cancelled");
+          },
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", function (response) {
+        toast.error(response.error?.description || "Payment failed");
+      });
+      rzp.open();
     } catch (error) {
       toast.error(error.response?.data?.message || error.message);
     }
@@ -190,15 +236,16 @@ const MyBooking = () => {
             <div className="text-6xl mb-4">🏨</div>
             <p className="text-gray-500 text-lg mb-2">No bookings found</p>
             <p className="text-gray-400 text-sm mb-6">Start by exploring our rooms!</p>
-            <a
-              href="/rooms"
+            <Link
+              to="/rooms"
+              onClick={() => scrollTo(0, 0)}
               className="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-full font-medium transition-all duration-300 hover:bg-gray-800 hover:shadow-lg btn-press"
             >
               Explore Rooms
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
-            </a>
+            </Link>
           </div>
         ) : (
           bookings.map((booking, index) => (
@@ -217,7 +264,7 @@ const MyBooking = () => {
                 <div className="flex flex-col gap-1.5 max-md:mt-3 min-md:ml-4">
                   <p className="font-playfair text-2xl">
                     {booking.hotel?.name}
-                    <span className="font-inter text-sm">
+                    <span className="text-sm">
                       ({booking.room?.roomType})
                     </span>
                   </p>

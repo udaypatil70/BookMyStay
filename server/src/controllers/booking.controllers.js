@@ -3,17 +3,21 @@ import Room from "../models/Room.models.js";
 import Hotel from "../models/Hotel.models.js";
 import User from "../models/user.models.js";
 import transporter from "../config/nodemailer.config.js";
-import Stripe from "stripe";
+import Razorpay from "razorpay";
+import crypto from "crypto";
 
-let stripe;
-const getStripe = () => {
-  if (!stripe) {
-    if (!process.env.STRIPE_SECRET_KEY) {
-      throw new Error("STRIPE_SECRET_KEY is not configured");
+let razorpay;
+const getRazorpay = () => {
+  if (!razorpay) {
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      throw new Error("Razorpay keys are not configured");
     }
-    stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
+    });
   }
-  return stripe;
+  return razorpay;
 };
 
 // Function to check room availability
@@ -306,9 +310,9 @@ const cancelBooking = async (req, res) => {
   }
 };
 
-// API to create Stripe payment intent
-// POST /api/bookings/create-payment-intent
-const stripePaymentIntent = async (req, res) => {
+// API to create Razorpay order
+// POST /api/bookings/create-razorpay-order
+const createRazorpayOrder = async (req, res) => {
   try {
     const { bookingId } = req.body;
     const userId = req.user._id;
@@ -343,11 +347,11 @@ const stripePaymentIntent = async (req, res) => {
       });
     }
 
-    // Create Stripe Payment Intent
-    const paymentIntent = await getStripe().paymentIntents.create({
-      amount: Math.round(booking.totalPrice * 100), // Stripe expects amount in cents
-      currency: "usd",
-      metadata: {
+    const order = await getRazorpay().orders.create({
+      amount: Math.round(booking.totalPrice * 100), // Razorpay expects amount in paise
+      currency: "INR",
+      receipt: `booking_${booking._id}`,
+      notes: {
         bookingId: booking._id.toString(),
         userId: userId.toString(),
         hotelName: booking.hotel.name,
@@ -356,8 +360,10 @@ const stripePaymentIntent = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      clientSecret: paymentIntent.client_secret,
+      orderId: order.id,
       amount: booking.totalPrice,
+      currency: "INR",
+      keyId: process.env.RAZORPAY_KEY_ID,
     });
   } catch (error) {
     return res.status(500).json({
@@ -367,71 +373,81 @@ const stripePaymentIntent = async (req, res) => {
   }
 };
 
-// Stripe Webhook to handle payment success
-// POST /api/bookings/stripe-webhook (registered with raw body in server.js)
-const stripeWebhook = async (req, res) => {
-  const sig = req.headers["stripe-signature"];
-  let event;
-
+// API to verify Razorpay payment
+// POST /api/bookings/verify-payment
+const verifyRazorpayPayment = async (req, res) => {
   try {
-    event = getStripe().webhooks.constructEvent(
-      req.body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET,
-    );
-  } catch (err) {
-    console.error("Webhook signature verification failed:", err.message);
-    return res.status(400).json({
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, bookingId } = req.body;
+    const userId = req.user._id;
+
+    // Verify signature
+    const body = razorpay_order_id + "|" + razorpay_payment_id;
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(body)
+      .digest("hex");
+
+    if (expectedSignature !== razorpay_signature) {
+      return res.status(400).json({
+        success: false,
+        message: "Payment verification failed: invalid signature",
+      });
+    }
+
+    // Update booking
+    const booking = await Booking.findByIdAndUpdate(
+      bookingId,
+      {
+        isPaid: true,
+        status: "confirmed",
+        paymentMethod: "Razorpay",
+      },
+      { new: true },
+    ).populate("room hotel");
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found",
+      });
+    }
+
+    // Send payment confirmation email
+    const userData = await User.findById(booking.user);
+
+    if (userData) {
+      const mailOptions = {
+        from: process.env.SENDER_EMAIL,
+        to: userData.email,
+        subject: "Payment Confirmed - Booking Updated",
+        html: `
+          <h2>Payment Confirmed</h2>
+          <p>Dear ${userData.username},</p>
+          <p>Your payment has been processed successfully.</p>
+          <ul>
+            <li><strong>Booking ID:</strong> ${booking._id}</li>
+            <li><strong>Hotel:</strong> ${booking.hotel.name}</li>
+            <li><strong>Amount Paid:</strong> ${process.env.CURRENCY || "₹"}${booking.totalPrice}</li>
+            <li><strong>Payment ID:</strong> ${razorpay_payment_id}</li>
+            <li><strong>Status:</strong> Confirmed</li>
+          </ul>
+          <p>We look forward to welcoming you!</p>
+        `,
+      };
+      await transporter.sendMail(mailOptions);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Payment verified and booking confirmed",
+      booking,
+    });
+  } catch (error) {
+    return res.status(500).json({
       success: false,
-      message: `Webhook Error: ${err.message}`,
+      message: error.message,
     });
   }
-
-  if (event.type === "payment_intent.succeeded") {
-    const paymentIntent = event.data.object;
-    const bookingId = paymentIntent.metadata.bookingId;
-
-    try {
-      const booking = await Booking.findByIdAndUpdate(
-        bookingId,
-        {
-          isPaid: true,
-          status: "confirmed",
-          paymentMethod: "Card",
-        },
-        { new: true },
-      );
-
-      if (booking) {
-        // Send payment confirmation email
-        const userData = await User.findById(booking.user);
-
-        if (userData) {
-          const mailOptions = {
-            from: process.env.SENDER_EMAIL,
-            to: userData.email,
-            subject: "Payment Confirmed - Booking Updated",
-            html: `
-              <h2>Payment Confirmed</h2>
-              <p>Dear ${userData.username},</p>
-              <p>Your payment has been processed successfully.</p>
-              <ul>
-                <li><strong>Booking ID:</strong> ${booking._id}</li>
-                <li><strong>Amount Paid:</strong> ${process.env.CURRENCY || "$"}${booking.totalPrice}</li>
-                <li><strong>Status:</strong> Confirmed</li>
-              </ul>
-              <p>We look forward to welcoming you!</p>
-            `,
-          };
-          await transporter.sendMail(mailOptions);
-        }
-      }
-    } catch (error) {
-      console.error("Error updating booking after payment:", error.message);
-    }
-  }
-
-  res.status(200).json({ received: true });
 };
 
 // API to get owner dashboard stats
@@ -604,8 +620,8 @@ export {
   getUserBookings,
   getHotelBookings,
   cancelBooking,
-  stripePaymentIntent,
-  stripeWebhook,
+  createRazorpayOrder,
+  verifyRazorpayPayment,
   getOwnerStats,
   updateBookingStatus,
 };

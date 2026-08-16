@@ -144,7 +144,7 @@ const Hero = () => {
             min="1"
             max="4"
             value={guests}
-            onChange={(e) => setGuests(e.target.value)}
+            onChange={(e) => setGuests(Number(e.target.value))}
             placeholder="1"
             className="mt-2 w-20 rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
           />

@@ -26,7 +26,7 @@ const HotelCard = ({ room, index }) => {
       className="group relative max-w-70 w-full rounded-xl overflow-hidden bg-white text-gray-500/90 shadow-[0px_4px_4px_rgba(0,0,0,0.05)] hover-lift card-glow"
     >
       <div className="img-zoom">
-        <img src={room.images[0]} alt={room.name} className="transition-transform duration-500" />
+        <img src={room.images[0]} alt={room.hotel.name} className="transition-transform duration-500" />
       </div>
 
       <button
@@ -46,7 +46,7 @@ const HotelCard = ({ room, index }) => {
         </svg>
       </button>
 
-      {index % 2 === 0 && (
+      {index === 0 && (
         <p className="px-3 py-1 absolute top-3 left-3 text-xs bg-white text-gray-800 font-medium rounded-full shadow-md animate-bounce-in">
           Best Seller
         </p>

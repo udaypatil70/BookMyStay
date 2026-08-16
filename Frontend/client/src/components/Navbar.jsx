@@ -28,8 +28,6 @@ const Navbar = () => {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Hotels", path: "/rooms" },
-    { name: "Experiences", path: "/experiences" },
-    { name: "About", path: "/about" },
     { name: "Contact", path: "/contact" },
   ];
 
@@ -40,6 +38,17 @@ const Navbar = () => {
   const location = useLocation();
 
   const { user, navigate, isOwner, setShowHotelReg } = useAppContext();
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMenuOpen]);
 
   useEffect(() => {
     if (location.pathname !== "/") {
@@ -70,31 +79,34 @@ const Navbar = () => {
     >
       {/* Logo */}
       <Link to="/">
-        <img
-          src={assets.Bookmystaylogo}
-          alt="BookMyStay"
-          className={`h-14 w-auto ${isScrolled ? "invert opacity-80" : ""}`}
-        />
+        <span className={`text-2xl font-playfair font-bold tracking-tight ${
+          isScrolled ? "text-gray-900" : "text-white"
+        } transition-colors duration-300`}>
+          BookMy<span className="text-primary">Stay</span>
+        </span>
       </Link>
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex items-center gap-4 lg:gap-8">
-        {navLinks.map((link) => (
-          <Link
-            key={link.name}
-            to={link.path}
-            className={`group flex flex-col gap-1 ${
-              isScrolled ? "text-gray-700" : "text-white"
-            }`}
-          >
-            {link.name}
-            <div
-              className={`h-0.5 w-0 transition-all duration-300 group-hover:w-full ${
-                isScrolled ? "bg-gray-700" : "bg-white"
+        {navLinks.map((link) => {
+          const isActive = location.pathname === link.path;
+          return (
+            <Link
+              key={link.name}
+              to={link.path}
+              className={`group flex flex-col gap-1 ${
+                isScrolled ? "text-gray-700" : "text-white"
               }`}
-            />
-          </Link>
-        ))}
+            >
+              {link.name}
+              <div
+                className={`h-0.5 transition-all duration-300 ${
+                  isActive ? "w-full" : "w-0 group-hover:w-full"
+                } ${isScrolled ? "bg-gray-700" : "bg-white"}`}
+              />
+            </Link>
+          );
+        })}
 
         {user && (
           <button
@@ -112,7 +124,7 @@ const Navbar = () => {
 
       {/* Right Side */}
       <div className="hidden md:flex items-center gap-4">
-        <button>
+        <button onClick={() => { navigate("/rooms"); scrollTo(0, 0); }}>
           <img
             src={assets.searchIcon}
             alt="Search"
@@ -177,19 +189,24 @@ const Navbar = () => {
           <img src={assets.closeMenu} alt="Close" className="h-6" />
         </button>
 
-        {navLinks.map((link, index) => (
-          <Link
-            key={link.name}
-            to={link.path}
-            onClick={() => setIsMenuOpen(false)}
-            className="text-xl font-medium text-gray-800 hover:text-primary transition-colors duration-300"
-            style={{
-              animationDelay: isMenuOpen ? `${index * 0.1}s` : '0s'
-            }}
-          >
-            {link.name}
-          </Link>
-        ))}
+        {navLinks.map((link, index) => {
+          const isActive = location.pathname === link.path;
+          return (
+            <Link
+              key={link.name}
+              to={link.path}
+              onClick={() => setIsMenuOpen(false)}
+              className={`text-xl font-medium transition-colors duration-300 ${
+                isActive ? "text-primary" : "text-gray-800 hover:text-primary"
+              }`}
+              style={{
+                animationDelay: isMenuOpen ? `${index * 0.1}s` : '0s'
+              }}
+            >
+              {link.name}
+            </Link>
+          );
+        })}
 
         {user && (
           <button

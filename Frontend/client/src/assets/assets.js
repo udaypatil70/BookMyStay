@@ -86,7 +86,7 @@ export const exclusiveOffers = [
     title: "Summer Escape Package",
     description: "Enjoy a complimentary night and daily breakfast",
     priceOff: 25,
-    expiryDate: "Aug 31",
+    expiryDate: "Dec 31",
     image: exclusiveOfferCardImg1,
   },
   {
@@ -94,7 +94,7 @@ export const exclusiveOffers = [
     title: "Romantic Getaway",
     description: "Special couples package including spa treatment",
     priceOff: 20,
-    expiryDate: "Sep 20",
+    expiryDate: "Jan 31",
     image: exclusiveOfferCardImg2,
   },
   {
@@ -103,7 +103,7 @@ export const exclusiveOffers = [
     description:
       "Book 60 days in advance and save on your stay at any of our luxury properties worldwide.",
     priceOff: 30,
-    expiryDate: "Sep 25",
+    expiryDate: "Feb 28",
     image: exclusiveOfferCardImg3,
   },
 ];
@@ -118,7 +118,7 @@ export const testimonials = [
       "https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=200",
     rating: 5,
     review:
-      "I've used many booking platforms before, but none compare to the personalized experience and attention to detail that QuickStay provides.",
+      "I've used many booking platforms before, but none compare to the personalized experience and attention to detail that BookMyStay provides.",
   },
   {
     id: 2,
@@ -128,7 +128,7 @@ export const testimonials = [
       "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200",
     rating: 4,
     review:
-      "QuickStay exceeded my expectations. The booking process was seamless, and the hotels were absolutely top-notch. Highly recommended!",
+      "BookMyStay exceeded my expectations. The booking process was seamless, and the hotels were absolutely top-notch. Highly recommended!",
   },
   {
     id: 3,
@@ -138,7 +138,7 @@ export const testimonials = [
       "https://images.unsplash.com/photo-1701615004837-40d8573b6652?q=80&w=200",
     rating: 5,
     review:
-      "Amazing service! I always find the best luxury accommodations through QuickStay. Their recommendations never disappoint!",
+      "Amazing service! I always find the best luxury accommodations through BookMyStay. Their recommendations never disappoint!",
   },
 ];
 
@@ -161,7 +161,7 @@ export const roomCommonData = [
   {
     icon: assets.badgeIcon,
     title: "Enhanced Cleaning",
-    description: "This host follows Staybnb's strict cleaning standards.",
+    description: "This host follows BookMyStay's strict cleaning standards.",
   },
   {
     icon: assets.locationFilledIcon,
@@ -266,7 +266,7 @@ export const userBookingsDummyData = [
     totalPrice: 299,
     guests: 1,
     status: "pending",
-    paymentMethod: "Stripe",
+    paymentMethod: "Razorpay",
     isPaid: true,
     createdAt: "2025-04-10T06:42:01.529Z",
     updatedAt: "2025-04-10T06:43:54.520Z",

@@ -171,7 +171,7 @@ export const createBookingSchema = {
     if (!data.guests || isNaN(guests) || guests < 1 || guests > 10) {
       errors.guests = "Guests must be between 1 and 10";
     }
-    const validPaymentMethods = ["Pay At Hotel", "Card", "UPI"];
+    const validPaymentMethods = ["Pay At Hotel", "Card", "UPI", "Razorpay"];
     if (data.paymentMethod && !validPaymentMethods.includes(data.paymentMethod)) {
       errors.paymentMethod = `Payment method must be one of: ${validPaymentMethods.join(", ")}`;
     }
@@ -202,6 +202,18 @@ export const contactSchema = {
     }
     if (!data.email || typeof data.email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
       errors.email = "A valid email is required";
+    }
+    if (data.phone && typeof data.phone === "string" && data.phone.trim().length > 0) {
+      const phoneClean = data.phone.replace(/[\s\-+()]/g, "");
+      if (!/^\d{7,15}$/.test(phoneClean)) {
+        errors.phone = "Please provide a valid phone number";
+      }
+    }
+    if (data.guests !== undefined) {
+      const guests = Number(data.guests);
+      if (isNaN(guests) || guests < 1 || guests > 10) {
+        errors.guests = "Guests must be between 1 and 10";
+      }
     }
     if (!data.message || typeof data.message !== "string" || data.message.trim().length < 10) {
       errors.message = "Message is required (min 10 characters)";
@@ -289,11 +301,30 @@ export const deleteRoomSchema = {
   },
 };
 
-export const stripePaymentSchema = {
+export const razorpayOrderSchema = {
   body: (data) => {
     const errors = {};
     if (!data.bookingId || typeof data.bookingId !== "string") {
       errors.bookingId = "Booking ID is required";
+    }
+    return Object.keys(errors).length > 0 ? errors : null;
+  },
+};
+
+export const razorpayVerifySchema = {
+  body: (data) => {
+    const errors = {};
+    if (!data.bookingId || typeof data.bookingId !== "string") {
+      errors.bookingId = "Booking ID is required";
+    }
+    if (!data.razorpay_order_id || typeof data.razorpay_order_id !== "string") {
+      errors.razorpay_order_id = "Razorpay order ID is required";
+    }
+    if (!data.razorpay_payment_id || typeof data.razorpay_payment_id !== "string") {
+      errors.razorpay_payment_id = "Razorpay payment ID is required";
+    }
+    if (!data.razorpay_signature || typeof data.razorpay_signature !== "string") {
+      errors.razorpay_signature = "Razorpay signature is required";
     }
     return Object.keys(errors).length > 0 ? errors : null;
   },

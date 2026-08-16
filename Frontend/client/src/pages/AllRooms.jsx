@@ -50,7 +50,7 @@ const AllRooms = () => {
   const checkOut = searchParams.get("checkOut") || "";
   const guests = searchParams.get("guests") || "";
 
-  const roomTypes = ["single Bed", "Double Bed", "Luxury Room", "Family Suite"];
+  const roomTypes = ["Single Bed", "Double Bed", "Luxury Room", "Family Suite"];
   const priceRanges = [
     "0 to 500",
     "500 to 1000",
@@ -258,7 +258,7 @@ const AllRooms = () => {
                 </p>
                 <div className="flex items-center gap-2">
                   <StarRating />
-                  <p className="ml-2">200+ Reviews</p>
+                  <p className="ml-2">Reviews</p>
                 </div>
                 <div className="flex items-center gap-1 text-gray-500 mt-2 text-sm">
                   <img src={assets.locationIcon} alt="location-icon" />

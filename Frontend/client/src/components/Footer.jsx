@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { assets } from "../assets/assets";
 
 const Footer = () => {
@@ -6,7 +7,9 @@ const Footer = () => {
     <div className="bg-[#F6F9FC] text-gray-500/80 pt-8 px-6 md:px-16 lg:px-24 xl:px-32">
       <div className="flex flex-wrap justify-between gap-12 md:gap-6 opacity-80">
         <div className="max-w-80">
-          <img src={assets.logo} alt="logo" className="mb-4 h-8 md:h-9 invert" />
+          <span className="mb-4 text-2xl font-playfair font-bold tracking-tight text-gray-900 inline-block">
+            BookMy<span className="text-primary">Stay</span>
+          </span>
           <p className="text-sm leading-relaxed">
             Discover the world's most extraordinary places to stay, from
             boutique hotels to luxury villas and private islands.
@@ -26,22 +29,22 @@ const Footer = () => {
         <div>
           <p className="font-playfair text-lg text-gray-800">COMPANY</p>
           <ul className="mt-3 flex flex-col gap-2.5 text-sm">
-            {["About", "Careers", "Press", "Blog", "Partners"].map((item) => (
-              <li key={item}>
-                <a href="#" className="transition-colors duration-300 hover:text-gray-800 hover:underline">{item}</a>
-              </li>
-            ))}
+            <li><Link to="/about" className="transition-colors duration-300 hover:text-gray-800 hover:underline">About</Link></li>
+            <li><span className="cursor-default">Careers</span></li>
+            <li><span className="cursor-default">Press</span></li>
+            <li><span className="cursor-default">Blog</span></li>
+            <li><span className="cursor-default">Partners</span></li>
           </ul>
         </div>
 
         <div>
           <p className="font-playfair text-lg text-gray-800">SUPPORT</p>
           <ul className="mt-3 flex flex-col gap-2.5 text-sm">
-            {["Help Center", "Safety Information", "Cancellation Options", "Contact Us", "Accessibility"].map((item) => (
-              <li key={item}>
-                <a href="#" className="transition-colors duration-300 hover:text-gray-800 hover:underline">{item}</a>
-              </li>
-            ))}
+            <li><span className="cursor-default">Help Center</span></li>
+            <li><span className="cursor-default">Safety Information</span></li>
+            <li><span className="cursor-default">Cancellation Options</span></li>
+            <li><Link to="/contact" className="transition-colors duration-300 hover:text-gray-800 hover:underline">Contact Us</Link></li>
+            <li><span className="cursor-default">Accessibility</span></li>
           </ul>
         </div>
 
@@ -72,7 +75,7 @@ const Footer = () => {
         <ul className="flex items-center gap-6">
           {["Privacy", "Terms", "Sitemap"].map((item) => (
             <li key={item}>
-              <a href="#" className="text-sm transition-colors duration-300 hover:text-gray-800">{item}</a>
+              <span className="text-sm cursor-default transition-colors duration-300">{item}</span>
             </li>
           ))}
         </ul>

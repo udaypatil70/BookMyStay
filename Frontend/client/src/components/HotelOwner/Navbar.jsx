@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { assets } from "../../assets/assets";
 import { UserButton } from "@clerk/react";
 
 const Navbar = () => {
@@ -7,11 +6,9 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-10 py-4 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-white/5 shadow-lg shadow-black/10">
       <Link to="/" className="flex items-center gap-3 group">
         <div className="relative">
-          <img
-            src={assets.Bookmystaylogo}
-            alt="BookMyStay"
-            className="h-10 w-auto"
-          />
+          <span className="text-xl font-playfair font-bold tracking-tight text-white">
+            BookMy<span className="text-blue-400">Stay</span>
+          </span>
           <div className="absolute -inset-1 bg-white/10 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         </div>
         <div className="hidden md:flex flex-col">

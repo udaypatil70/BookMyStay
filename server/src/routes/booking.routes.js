@@ -7,7 +7,8 @@ import {
   getHotelBookings,
   getUserBookings,
   cancelBooking,
-  stripePaymentIntent,
+  createRazorpayOrder,
+  verifyRazorpayPayment,
   getOwnerStats,
   updateBookingStatus,
 } from "../controllers/booking.controllers.js";
@@ -15,7 +16,8 @@ import {
   checkAvailabilitySchema,
   createBookingSchema,
   cancelBookingSchema,
-  stripePaymentSchema,
+  razorpayOrderSchema,
+  razorpayVerifySchema,
   updateBookingStatusSchema,
 } from "../validations/schemas.js";
 
@@ -41,10 +43,16 @@ bookingRouter.post(
   cancelBooking,
 );
 bookingRouter.post(
-  "/create-payment-intent",
+  "/create-razorpay-order",
   protect,
-  validate(stripePaymentSchema),
-  stripePaymentIntent,
+  validate(razorpayOrderSchema),
+  createRazorpayOrder,
+);
+bookingRouter.post(
+  "/verify-payment",
+  protect,
+  validate(razorpayVerifySchema),
+  verifyRazorpayPayment,
 );
 
 // Owner routes
