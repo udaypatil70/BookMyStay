@@ -8,6 +8,16 @@ axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 
 const AppContext = createContext();
 
+// Safe wrapper around Clerk's getToken that handles clipboard errors
+const safeGetToken = async (getToken) => {
+  try {
+    return await getToken();
+  } catch (err) {
+    console.warn("getToken failed (clipboard/permissions issue):", err.message);
+    return null;
+  }
+};
+
 export const AppProvider = ({ children }) => {
   const currency = import.meta.env.VITE_CURRENCY || "$";
 
@@ -21,12 +31,11 @@ export const AppProvider = ({ children }) => {
   const [rooms, setRooms] = useState([]);
 
   const fetchRooms = async () => {
-
     try {
       const { data } = await axios.get("/api/rooms");
-      if(data.success){
-        setRooms(data.rooms)
-      }else{
+      if (data.success) {
+        setRooms(data.rooms);
+      } else {
         toast.error(data.message);
       }
     } catch (error) {
@@ -37,10 +46,13 @@ export const AppProvider = ({ children }) => {
   const fetchUser = async () => {
     if (!user) return;
 
+    const token = await safeGetToken(getToken);
+    if (!token) return;
+
     try {
       const { data } = await axios.get("/api/user", {
         headers: {
-          Authorization: `Bearer ${await getToken()}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -60,18 +72,18 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     if (user) {
       fetchUser();
-    } 
+    }
   }, [user]);
 
   useEffect(() => {
     fetchRooms();
-  },[])
+  }, []);
 
   const value = {
     currency,
     navigate,
     user,
-    getToken,
+    getToken: () => safeGetToken(getToken),
     axios,
     isOwner,
     setIsOwner,
@@ -81,7 +93,7 @@ export const AppProvider = ({ children }) => {
     setSearchedCities,
     fetchUser,
     rooms,
-    setRooms
+    setRooms,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
