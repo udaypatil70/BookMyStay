@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Title from "../../components/Title";
 import { assets } from "../../assets/assets";
 import { useAppContext } from "../../context/AppContext";
+import toast from "react-hot-toast";
 
 const Dashboard = () => {
-  const { currency, user, getToken, toast, axios } = useAppContext();
+  const { currency, user, getToken, axios } = useAppContext();
 
   const [dashboardData, setDashboardData] = useState({
     bookings: [],
@@ -35,6 +36,28 @@ const Dashboard = () => {
       fetchDashboardData();
     }
   }, [user]);
+
+  const getBookingStatusBadge = (booking) => {
+    if (booking.status === "cancelled") {
+      return (
+        <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-red-100 text-red-700">
+          Cancelled
+        </span>
+      );
+    }
+    if (booking.isPaid || booking.status === "confirmed") {
+      return (
+        <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-emerald-100 text-emerald-700">
+          Completed
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-amber-100 text-amber-700">
+        Pending
+      </span>
+    );
+  };
 
   return (
     <div>
@@ -98,23 +121,21 @@ const Dashboard = () => {
                 <th className="py-4 px-4">User Name</th>
                 <th className="py-4 px-4 hidden sm:table-cell">Room Name</th>
                 <th className="py-4 px-4 text-center">Total Amount</th>
-                <th className="py-4 px-4 text-center">Payment Status</th>
+                <th className="py-4 px-4 text-center">Status</th>
               </tr>
             </thead>
             <tbody className="text-sm text-slate-700">
               {dashboardData.bookings.map((item, index) => (
                 <tr key={index} className="border-t border-slate-200">
-                  <td className="py-4 px-4">{item.user.username}</td>
+                  <td className="py-4 px-4">{item.user?.username}</td>
                   <td className="py-4 px-4 hidden sm:table-cell">
-                    {item.room.roomType}
+                    {item.room?.roomType}
                   </td>
-                  <td className="py-4 px-4 text-center">{currency} {item.totalPrice}</td>
                   <td className="py-4 px-4 text-center">
-                    <span
-                      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${item.isPaid ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}
-                    >
-                      {item.isPaid ? "Completed" : "Pending"}
-                    </span>
+                    {currency} {item.totalPrice}
+                  </td>
+                  <td className="py-4 px-4 text-center">
+                    {getBookingStatusBadge(item)}
                   </td>
                 </tr>
               ))}

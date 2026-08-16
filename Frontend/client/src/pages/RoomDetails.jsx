@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { assets, facilityIcons, roomCommonData } from "../assets/assets";
 import StarRating from "../components/StarRating";
 import { useAppContext } from "../context/AppContext";
@@ -7,20 +7,29 @@ import toast from "react-hot-toast";
 
 const RoomDetails = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const { rooms, getToken, axios, navigate } = useAppContext();
 
   const [room, setRoom] = useState(null);
   const [mainImage, setMainImage] = useState(null);
-  const [checkInDate, setCheckInDate] = useState([]);
-  const [checkOutDate, setCheckOutDate] = useState([]);
-  const [guests, setGuests] = useState(1);
+  const [checkInDate, setCheckInDate] = useState(
+    searchParams.get("checkIn") || "",
+  );
+  const [checkOutDate, setCheckOutDate] = useState(
+    searchParams.get("checkOut") || "",
+  );
+  const [guests, setGuests] = useState(searchParams.get("guests") || 1);
   const [isAvailable, setIsAvailable] = useState(false);
 
-  //check if the Room is Aailable
-  const checkAvailability = async (e) => {
+  // Check if the Room is Available
+  const checkAvailability = async () => {
     try {
+      if (!checkInDate || !checkOutDate) {
+        toast.error("Please select check-in and check-out dates");
+        return;
+      }
       if (checkInDate >= checkOutDate) {
-        toast.error("check-In Date should be less than check-out Date");
+        toast.error("Check-in date should be before check-out date");
         return;
       }
       const { data } = await axios.post("/api/bookings/check-availability", {
@@ -34,7 +43,7 @@ const RoomDetails = () => {
           toast.success("Room is available");
         } else {
           setIsAvailable(false);
-          toast.error("Room is not available");
+          toast.error("Room is not available for the selected dates");
         }
       } else {
         toast.error(data.message);
@@ -80,13 +89,16 @@ const RoomDetails = () => {
   useEffect(() => {
     const room = rooms?.find((room) => room._id === id);
 
-    console.log(room);
-
     if (room) {
       setRoom(room);
-      setMainImage(room.images?.[0]); // or room.image?.[0]
+      setMainImage(room.images?.[0]);
     }
   }, [rooms, id]);
+
+  // Reset availability when dates change
+  useEffect(() => {
+    setIsAvailable(false);
+  }, [checkInDate, checkOutDate]);
 
   return (
     room && (
@@ -165,7 +177,7 @@ const RoomDetails = () => {
             </div>
           </div>
 
-          {/*room price */}
+          {/* room price */}
           <p className="text-2xl font-medium">${room.pricePerNight}/night</p>
         </div>
 
@@ -182,11 +194,12 @@ const RoomDetails = () => {
               </label>
               <input
                 onChange={(e) => setCheckInDate(e.target.value)}
+                value={checkInDate}
                 min={new Date().toISOString().split("T")[0]}
                 type="date"
                 id="checkInDate"
                 placeholder="check-In"
-                className="w-full rounded border border border-gray-300 px-3 py-2 mt-1.5 outline-non"
+                className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none"
                 required
               />
             </div>
@@ -200,12 +213,13 @@ const RoomDetails = () => {
               </label>
               <input
                 onChange={(e) => setCheckOutDate(e.target.value)}
+                value={checkOutDate}
                 min={checkInDate}
                 disabled={!checkInDate}
                 type="date"
                 id="checkOutDate"
                 placeholder="check-Out"
-                className="w-full rounded border border border-gray-300 px-3 py-2 mt-1.5 outline-non"
+                className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none"
                 required
               />
             </div>

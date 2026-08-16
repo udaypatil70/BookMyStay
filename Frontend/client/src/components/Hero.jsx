@@ -6,30 +6,47 @@ import { useAppContext } from "../context/AppContext";
 const Hero = () => {
   const { navigate, getToken, axios, setSearchedCities } = useAppContext();
   const [destination, setDestination] = useState("");
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [guests, setGuests] = useState(1);
 
   const onSearch = async (e) => {
     e.preventDefault();
-    navigate(`/rooms?destination=${destination}`);
 
-    // call api to save recent searched city
-    await axios.post(
-      "/api/user/store-recent-search",
-      { recentSearchedCity: destination },
-      {
-        headers: {
-          Authorization: `Bearer ${await getToken()}`,
-        },
-      },
-    );
+    // Build query params
+    const params = new URLSearchParams();
+    if (destination) params.set("destination", destination);
+    if (checkIn) params.set("checkIn", checkIn);
+    if (checkOut) params.set("checkOut", checkOut);
+    if (guests) params.set("guests", guests);
 
-    // add destination to searched citiesmax 3 recent searches cities 
-    setSearchedCities((prevSearchedCities) => {
-      const updatedSearchedCities = [destination, ...prevSearchedCities];
-      if(updatedSearchedCities.length > 3){
-        updatedSearchedCities.shift();
+    navigate(`/rooms?${params.toString()}`);
+
+    // Call API to save recent searched city
+    if (destination) {
+      try {
+        await axios.post(
+          "/api/user/store-recent-search",
+          { recentSearchedCity: destination },
+          {
+            headers: {
+              Authorization: `Bearer ${await getToken()}`,
+            },
+          },
+        );
+
+        // Add destination to searched cities (max 3 recent searches)
+        setSearchedCities((prevSearchedCities) => {
+          const updatedSearchedCities = [destination, ...prevSearchedCities];
+          if (updatedSearchedCities.length > 3) {
+            updatedSearchedCities.shift();
+          }
+          return updatedSearchedCities;
+        });
+      } catch (error) {
+        // Silently fail - don't block search for save failure
       }
-      return updatedSearchedCities;
-    })
+    }
   };
 
   return (
@@ -52,7 +69,7 @@ const Hero = () => {
 
       <form
         onSubmit={onSearch}
-        className="mt-8 flex flex-col gap-4 rounded-xl bg-white px-6 py-4 mt-8 text-gray-600 shadow-lg md:flex-row md:items-end"
+        className="mt-8 flex flex-col gap-4 rounded-xl bg-white px-6 py-4 text-gray-600 shadow-lg md:flex-row md:items-end"
       >
         {/* Destination */}
         <div>
@@ -89,6 +106,9 @@ const Hero = () => {
           <input
             id="checkIn"
             type="date"
+            value={checkIn}
+            onChange={(e) => setCheckIn(e.target.value)}
+            min={new Date().toISOString().split("T")[0]}
             className="mt-2 rounded border border-gray-300 px-3 py-2 text-sm outline-none"
           />
         </div>
@@ -103,6 +123,10 @@ const Hero = () => {
           <input
             id="checkOut"
             type="date"
+            value={checkOut}
+            onChange={(e) => setCheckOut(e.target.value)}
+            min={checkIn || new Date().toISOString().split("T")[0]}
+            disabled={!checkIn}
             className="mt-2 rounded border border-gray-300 px-3 py-2 text-sm outline-none"
           />
         </div>
@@ -116,6 +140,8 @@ const Hero = () => {
             type="number"
             min="1"
             max="4"
+            value={guests}
+            onChange={(e) => setGuests(e.target.value)}
             placeholder="1"
             className="mt-2 w-20 rounded border border-gray-300 px-3 py-2 text-sm outline-none"
           />

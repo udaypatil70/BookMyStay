@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { assets, facilityIcons } from "../assets/assets";
 import { useSearchParams } from "react-router-dom";
 import StarRating from "../components/StarRating";
 import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 const CheckBox = ({ label, selected = false, onChange = () => {} }) => {
   return (
@@ -32,15 +33,22 @@ const RadioButton = ({ label, selected = false, onChange = () => {} }) => {
 };
 
 const AllRooms = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [openFilters, setOpenFilters] = useState(false);
-  const { rooms, navigate, currency } = useAppContext();
+  const { axios, navigate, currency } = useAppContext();
+  const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedFilters, setSelectedFilters] = useState({
     roomTypes: [],
     priceRanges: [],
   });
 
   const [selectedSort, setSelectedSort] = useState("");
+
+  const destination = searchParams.get("destination") || "";
+  const checkIn = searchParams.get("checkIn") || "";
+  const checkOut = searchParams.get("checkOut") || "";
+  const guests = searchParams.get("guests") || "";
 
   const roomTypes = ["single Bed", "Double Bed", "Luxury Room", "Family Suite"];
   const priceRanges = [
@@ -54,6 +62,34 @@ const AllRooms = () => {
     "Price High to Low",
     "Newest First",
   ];
+
+  // Fetch rooms with date filtering from backend
+  const fetchRooms = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (checkIn) params.set("checkInDate", checkIn);
+      if (checkOut) params.set("checkOutDate", checkOut);
+
+      const queryString = params.toString();
+      const url = `/api/rooms${queryString ? `?${queryString}` : ""}`;
+
+      const { data } = await axios.get(url);
+      if (data.success) {
+        setRooms(data.rooms);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRooms();
+  }, [checkIn, checkOut]);
 
   // Handle changes for filter and sorting
   const handleFilterChanage = (checked, value, type) => {
@@ -74,7 +110,7 @@ const AllRooms = () => {
     setSelectedSort(sortOptions);
   };
 
-  // function to check if a room matches the selected room types
+  // Function to check if a room matches the selected room types
   const matchesRoomType = (room) => {
     return (
       selectedFilters.roomTypes.length === 0 ||
@@ -109,13 +145,11 @@ const AllRooms = () => {
 
   // Filter Destination
   const filterDestination = (room) => {
-    const destination = searchParams.get("destination");
     if (!destination) return true;
-
     return room.hotel.city.toLowerCase().includes(destination.toLowerCase());
   };
 
-  // Filter and sort rooms based on the selected  filters and sort option
+  // Filter and sort rooms based on the selected filters and sort option
   const filteredRooms = useMemo(() => {
     return rooms
       .filter(
@@ -127,86 +161,107 @@ const AllRooms = () => {
       .sort(sortRooms);
   }, [rooms, selectedFilters, selectedSort, searchParams]);
 
-  //clear all filter
+  // Clear all filters
   const clearFilters = () => {
     setSelectedFilters({
       roomTypes: [],
       priceRanges: [],
     });
     setSelectedSort("");
-    setSearchParams({});
   };
 
   return (
     <div className="flex flex-col-reverse lg:flex-row item-start justify-between pt-28 md:pt-35 px-4 md:px-16 lg:px-24">
-      <div>
+      <div className="flex-1">
         <div className="flex flex-col items-start text-left">
-          <h1 className="font-playfair text-4xl md:text-[40px]">Hotel Rooms</h1>
+          <h1 className="font-playfair text-4xl md:text-[40px]">
+            Hotel Rooms
+          </h1>
           <p className="text-sm md:text-base text-gray-500/90 mt-2 max-w-174">
             Take advantages of our limited-time offers and special packages to
             enhance your stay and create unforgettable memories.
           </p>
+          {checkIn && checkOut && (
+            <div className="mt-3 flex items-center gap-2 text-sm text-gray-600 bg-gray-100 px-3 py-1.5 rounded-lg">
+              <img src={assets.calenderIcon} alt="" className="h-4" />
+              <span>
+                {new Date(checkIn).toLocaleDateString()} -{" "}
+                {new Date(checkOut).toLocaleDateString()}
+              </span>
+              {guests && <span>| {guests} Guest{guests > 1 ? "s" : ""}</span>}
+            </div>
+          )}
         </div>
 
-        {filteredRooms.map((room) => (
-          <div
-            key={room._id}
-            className="flex flex-col md:flex-row items-start py-10 gap-6 border-b border-gray-300 last:pb-30 last:border-0"
-          >
-            <img
-              onClick={() => {
-                navigate(`/rooms/${room._id}`);
-                scrollTo(0, 0);
-              }}
-              src={room.images[0]}
-              alt="hotel-img"
-              title="View Room Details"
-              className="max-h-65 md:w-1/2 rounded-xl shadow-lg shadow-lg object-cover cursor-pointer"
-            />
-            <div className="md:w-1/2 flex flex-col gap-2">
-              <p className="text-gray-500">{room.hotel.city}</p>
-              <p
+        {loading ? (
+          <div className="py-20 text-center text-gray-500">
+            Loading rooms...
+          </div>
+        ) : filteredRooms.length === 0 ? (
+          <div className="py-20 text-center text-gray-500">
+            No rooms found matching your criteria. Try adjusting your filters.
+          </div>
+        ) : (
+          filteredRooms.map((room) => (
+            <div
+              key={room._id}
+              className="flex flex-col md:flex-row items-start py-10 gap-6 border-b border-gray-300 last:pb-30 last:border-0"
+            >
+              <img
                 onClick={() => {
                   navigate(`/rooms/${room._id}`);
                   scrollTo(0, 0);
                 }}
-                className="text-gray-500 text-3xl font-playfair"
-              >
-                {room.hotel.name}
-              </p>
-              <div className="flex items-center gap-2">
-                <StarRating />
-                <p className="ml-2">200+ Reviews</p>
+                src={room.images[0]}
+                alt="hotel-img"
+                title="View Room Details"
+                className="max-h-65 md:w-1/2 rounded-xl shadow-lg object-cover cursor-pointer"
+              />
+              <div className="md:w-1/2 flex flex-col gap-2">
+                <p className="text-gray-500">{room.hotel.city}</p>
+                <p
+                  onClick={() => {
+                    navigate(`/rooms/${room._id}`);
+                    scrollTo(0, 0);
+                  }}
+                  className="text-gray-500 text-3xl font-playfair"
+                >
+                  {room.hotel.name}
+                </p>
+                <div className="flex items-center gap-2">
+                  <StarRating />
+                  <p className="ml-2">200+ Reviews</p>
+                </div>
+                <div className="flex item-center gap-1 text-gray-500 mt-2 text-sm">
+                  <img src={assets.locationIcon} alt="location-icon" />
+                  <span>{room.hotel.address}</span>
+                </div>
+                {/* Room Amenities */}
+                <div className="flex flex-wrap items-center mt-3 mb-6 gap-4">
+                  {room.amenities.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F5F5FF]/70"
+                    >
+                      <img
+                        src={facilityIcons[item]}
+                        alt={item}
+                        className="w-5 h-5"
+                      />
+                      <p className="text-xs">{item}</p>
+                    </div>
+                  ))}
+                </div>
+                {/* Room price per Night */}
+                <p className="text-xl font-medium text-gray-700">
+                  ${room.pricePerNight} /night
+                </p>
               </div>
-              <div className="flex item-center gap-1 text-gray-500 mt-2 text-sm">
-                <img src={assets.locationIcon} alt="location-icon" />
-                <span>{room.hotel.address}</span>
-              </div>
-              {/* Room Amentities */}
-              <div className="flex flex-wrap items-center mt-3 mb-6 gap-4">
-                {room.amenities.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F5F5FF]/70"
-                  >
-                    <img
-                      src={facilityIcons[item]}
-                      alt={item}
-                      className="w-5 h-5"
-                    />
-                    <p className="text-xs">{item}</p>
-                  </div>
-                ))}
-              </div>
-              {/* Room price per Night*/}
-              <p className="text-xl font-medium text-gray-700">
-                ${room.pricePerNight} /night
-              </p>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
-      {/* filter section*/}
+      {/* Filter section */}
       <div className="bg-white w-80 border border-gray-300 text-gray-600 max-lg:mb-8 min-lg:mt-16">
         <div
           className={`flex item-center justify-between px-5 py-2.5 min-lg:border-b border-gray-300 ${openFilters && "border-b"}`}
@@ -219,7 +274,9 @@ const AllRooms = () => {
             >
               {openFilters ? "HIDE" : "SHOW"}
             </span>
-            <span className="hidden lg:block">CLEAR</span>
+            <span className="hidden lg:block" onClick={clearFilters}>
+              CLEAR
+            </span>
           </div>
         </div>
 
