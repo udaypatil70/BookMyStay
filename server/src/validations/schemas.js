@@ -61,6 +61,76 @@ export const toggleAvailabilitySchema = {
   },
 };
 
+export const searchRoomsSchema = {
+  query: (data) => {
+    const errors = {};
+    if (data.priceMin && (isNaN(Number(data.priceMin)) || Number(data.priceMin) < 0)) {
+      errors.priceMin = "Minimum price must be a positive number";
+    }
+    if (data.priceMax && (isNaN(Number(data.priceMax)) || Number(data.priceMax) < 0)) {
+      errors.priceMax = "Maximum price must be a positive number";
+    }
+    if (data.priceMin && data.priceMax && Number(data.priceMin) > Number(data.priceMax)) {
+      errors.priceMax = "Maximum price must be greater than minimum price";
+    }
+    if (data.page && (isNaN(Number(data.page)) || Number(data.page) < 1)) {
+      errors.page = "Page must be a positive number";
+    }
+    return Object.keys(errors).length > 0 ? errors : null;
+  },
+};
+
+export const updateProfileSchema = {
+  body: (data) => {
+    const errors = {};
+    if (data.username !== undefined) {
+      if (typeof data.username !== "string" || data.username.trim().length < 2) {
+        errors.username = "Username must be at least 2 characters";
+      }
+    }
+    if (data.phone !== undefined && data.phone && typeof data.phone === "string") {
+      const phoneClean = data.phone.replace(/[\s\-+()]/g, "");
+      if (!/^\d{7,15}$/.test(phoneClean)) {
+        errors.phone = "Please provide a valid phone number";
+      }
+    }
+    return Object.keys(errors).length > 0 ? errors : null;
+  },
+};
+
+export const updateHotelSchema = {
+  body: (data) => {
+    const errors = {};
+    if (data.name !== undefined && (typeof data.name !== "string" || data.name.trim().length < 2)) {
+      errors.name = "Hotel name must be at least 2 characters";
+    }
+    if (data.address !== undefined && (typeof data.address !== "string" || data.address.trim().length < 5)) {
+      errors.address = "Address must be at least 5 characters";
+    }
+    if (data.contact !== undefined && (typeof data.contact !== "string" || data.contact.trim().length < 5)) {
+      errors.contact = "Contact must be at least 5 characters";
+    }
+    if (data.city !== undefined && (typeof data.city !== "string" || data.city.trim().length < 2)) {
+      errors.city = "City must be at least 2 characters";
+    }
+    return Object.keys(errors).length > 0 ? errors : null;
+  },
+};
+
+export const updateBookingStatusSchema = {
+  body: (data) => {
+    const errors = {};
+    if (!data.bookingId || typeof data.bookingId !== "string") {
+      errors.bookingId = "Booking ID is required";
+    }
+    const validStatuses = ["confirmed", "cancelled"];
+    if (!data.status || !validStatuses.includes(data.status)) {
+      errors.status = `Status must be one of: ${validStatuses.join(", ")}`;
+    }
+    return Object.keys(errors).length > 0 ? errors : null;
+  },
+};
+
 export const checkAvailabilitySchema = {
   body: (data) => {
     const errors = {};

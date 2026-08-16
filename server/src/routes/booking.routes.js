@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../middleware/auth.middleware.js";
+import { protect, ownerGuard } from "../middleware/auth.middleware.js";
 import validate from "../middleware/validate.middleware.js";
 import {
   checkAvailabilityAPI,
@@ -8,13 +8,15 @@ import {
   getUserBookings,
   cancelBooking,
   stripePaymentIntent,
-  stripeWebhook,
+  getOwnerStats,
+  updateBookingStatus,
 } from "../controllers/booking.controllers.js";
 import {
   checkAvailabilitySchema,
   createBookingSchema,
   cancelBookingSchema,
   stripePaymentSchema,
+  updateBookingStatusSchema,
 } from "../validations/schemas.js";
 
 const bookingRouter = express.Router();
@@ -43,6 +45,15 @@ bookingRouter.post(
   protect,
   validate(stripePaymentSchema),
   stripePaymentIntent,
+);
+
+// Owner routes
+bookingRouter.get("/owner/stats", ownerGuard, getOwnerStats);
+bookingRouter.put(
+  "/status",
+  ownerGuard,
+  validate(updateBookingStatusSchema),
+  updateBookingStatus,
 );
 
 export default bookingRouter;

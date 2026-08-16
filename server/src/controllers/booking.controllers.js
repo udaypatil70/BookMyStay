@@ -432,6 +432,170 @@ const stripeWebhook = async (req, res) => {
   res.status(200).json({ received: true });
 };
 
+// API to get owner dashboard stats
+// GET /api/bookings/owner/stats
+const getOwnerStats = async (req, res) => {
+  try {
+    const hotel = await Hotel.findOne({ owner: req.user._id });
+
+    if (!hotel) {
+      return res.status(404).json({
+        success: false,
+        message: "No hotel found",
+      });
+    }
+
+    const bookings = await Booking.find({ hotel: hotel._id })
+      .populate("room")
+      .sort({ createdAt: -1 });
+
+    const activeBookings = bookings.filter((b) => b.status !== "cancelled");
+
+    const totalRevenue = activeBookings
+      .filter((b) => b.isPaid)
+      .reduce((acc, b) => acc + b.totalPrice, 0);
+
+    const pendingRevenue = activeBookings
+      .filter((b) => !b.isPaid && b.status !== "cancelled")
+      .reduce((acc, b) => acc + b.totalPrice, 0);
+
+    const pendingBookings = activeBookings.filter((b) => b.status === "pending").length;
+    const confirmedBookings = activeBookings.filter((b) => b.status === "confirmed").length;
+    const cancelledBookings = bookings.filter((b) => b.status === "cancelled").length;
+
+    // Monthly revenue (last 12 months)
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+
+    const monthlyRevenue = await Booking.aggregate([
+      {
+        $match: {
+          hotel: hotel._id,
+          isPaid: true,
+          status: { $ne: "cancelled" },
+          createdAt: { $gte: twelveMonthsAgo },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+          },
+          revenue: { $sum: "$totalPrice" },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
+    ]);
+
+    // Recent 5 bookings
+    const recentBookings = bookings.slice(0, 5);
+
+    return res.status(200).json({
+      success: true,
+      stats: {
+        totalBookings: activeBookings.length,
+        pendingBookings,
+        confirmedBookings,
+        cancelledBookings,
+        totalRevenue,
+        pendingRevenue,
+        monthlyRevenue,
+        recentBookings,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// API to update booking status (owner can confirm/check-in)
+// PUT /api/bookings/status
+const updateBookingStatus = async (req, res) => {
+  try {
+    const { bookingId, status } = req.body;
+
+    if (!bookingId || !status) {
+      return res.status(400).json({
+        success: false,
+        message: "Booking ID and status are required",
+      });
+    }
+
+    const validStatuses = ["confirmed", "cancelled"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Status must be one of: ${validStatuses.join(", ")}`,
+      });
+    }
+
+    const booking = await Booking.findById(bookingId).populate("room hotel");
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found",
+      });
+    }
+
+    // Verify the booking belongs to the owner's hotel
+    const hotel = await Hotel.findOne({ owner: req.user._id });
+    if (!hotel || booking.hotel._id.toString() !== hotel._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to modify this booking",
+      });
+    }
+
+    booking.status = status;
+    await booking.save();
+
+    // Send status update email
+    const userData = await User.findById(booking.user);
+    if (userData) {
+      const statusText = status === "confirmed" ? "confirmed" : "cancelled";
+      try {
+        await transporter.sendMail({
+          from: process.env.SENDER_EMAIL,
+          to: userData.email,
+          subject: `Booking ${statusText.charAt(0).toUpperCase() + statusText.slice(1)} - ${booking.hotel.name}`,
+          html: `
+            <h2>Booking ${statusText.charAt(0).toUpperCase() + statusText.slice(1)}</h2>
+            <p>Dear ${userData.username},</p>
+            <p>Your booking at <strong>${booking.hotel.name}</strong> has been <strong>${statusText}</strong>.</p>
+            <ul>
+              <li><strong>Booking ID:</strong> ${booking._id}</li>
+              <li><strong>Room Type:</strong> ${booking.room.roomType}</li>
+              <li><strong>Check-In:</strong> ${new Date(booking.checkInDate).toDateString()}</li>
+              <li><strong>Check-Out:</strong> ${new Date(booking.checkOutDate).toDateString()}</li>
+              <li><strong>Total:</strong> ${process.env.CURRENCY || "$"}${booking.totalPrice}</li>
+            </ul>
+            <p>Thank you for choosing BookMyStay!</p>
+          `,
+        });
+      } catch {
+        // email failure is non-critical
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Booking ${status} successfully`,
+      booking,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export {
   checkAvailabilityAPI,
   createBooking,
@@ -440,4 +604,6 @@ export {
   cancelBooking,
   stripePaymentIntent,
   stripeWebhook,
+  getOwnerStats,
+  updateBookingStatus,
 };

@@ -13,6 +13,8 @@ import roomRouter from "./src/routes/room.routes.js";
 import bookingRouter from "./src/routes/booking.routes.js";
 import reviewRouter from "./src/routes/review.routes.js";
 import publicRouter from "./src/routes/public.routes.js";
+import searchRouter from "./src/routes/search.routes.js";
+import adminRouter from "./src/routes/admin.routes.js";
 import { stripeWebhook } from "./src/controllers/booking.controllers.js";
 
 const app = express();
@@ -84,6 +86,8 @@ app.use("/api/hotels", authLimiter, hotelRouter);
 app.use("/api/rooms", roomRouter);
 app.use("/api/bookings", bookingRouter);
 app.use("/api/reviews", reviewRouter);
+app.use("/api/search", searchRouter);
+app.use("/api/admin", adminRouter);
 app.use("/api", publicRouter);
 
 // 404 handler
