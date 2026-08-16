@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Title from "../components/Title";
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 const contactOptions = [
   {
@@ -39,6 +41,41 @@ const contactOptions = [
 ];
 
 const Contact = () => {
+  const { axios } = useAppContext();
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    if (form.message.trim().length < 10) {
+      toast.error("Message must be at least 10 characters");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data } = await axios.post("/api/contact", form);
+      if (data.success) {
+        toast.success(data.message);
+        setForm({ name: "", email: "", message: "" });
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-slate-50 pt-24 pb-20">
       <div className="px-6 md:px-16 lg:px-24 xl:px-32">
@@ -86,24 +123,47 @@ const Contact = () => {
             <p className="text-sm uppercase tracking-[0.25em] text-slate-300">
               Quick enquiry
             </p>
-            <form className="mt-6 space-y-4">
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
               <input
                 type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
                 placeholder="Your name"
                 className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-300 focus:border-white/30 focus:bg-white/15 transition-all duration-300"
               />
               <input
                 type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
                 placeholder="Your email"
                 className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-300 focus:border-white/30 focus:bg-white/15 transition-all duration-300"
               />
               <textarea
+                name="message"
                 rows="4"
-                placeholder="Tell us what you need"
+                value={form.message}
+                onChange={handleChange}
+                placeholder="Tell us what you need (min 10 characters)"
                 className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-300 focus:border-white/30 focus:bg-white/15 transition-all duration-300"
               />
-              <button className="rounded-full bg-white px-6 py-2.5 text-sm font-medium text-slate-900 transition-all duration-300 hover:bg-slate-100 hover:shadow-lg btn-press">
-                Send Request
+              <button
+                type="submit"
+                disabled={loading}
+                className="rounded-full bg-white px-6 py-2.5 text-sm font-medium text-slate-900 transition-all duration-300 hover:bg-slate-100 hover:shadow-lg btn-press disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Sending...
+                  </>
+                ) : (
+                  "Send Request"
+                )}
               </button>
             </form>
 

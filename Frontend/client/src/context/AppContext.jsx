@@ -29,6 +29,7 @@ export const AppProvider = ({ children }) => {
   const [showHotelReg, setShowHotelReg] = useState(false);
   const [searchedCities, setSearchedCities] = useState([]);
   const [rooms, setRooms] = useState([]);
+  const [favourites, setFavourites] = useState([]);
 
   const fetchRooms = async () => {
     try {
@@ -59,6 +60,7 @@ export const AppProvider = ({ children }) => {
       if (data.success) {
         setIsOwner(data.role === "hotelOwner");
         setSearchedCities(data.recentSearchedCities);
+        fetchFavourites(token);
       } else {
         setTimeout(() => {
           fetchUser();
@@ -79,6 +81,39 @@ export const AppProvider = ({ children }) => {
     fetchRooms();
   }, []);
 
+  const fetchFavourites = async (token) => {
+    try {
+      const t = token || await safeGetToken(getToken);
+      if (!t) return;
+      const { data } = await axios.get("/api/user/favourites", {
+        headers: { Authorization: `Bearer ${t}` },
+      });
+      if (data.success) {
+        setFavourites(data.favourites.map((h) => h._id));
+      }
+    } catch {}
+  };
+
+  const toggleFavourite = async (hotelId) => {
+    try {
+      const token = await safeGetToken(getToken);
+      if (!token) return;
+      const { data } = await axios.post(
+        "/api/user/toggle-favourite",
+        { hotelId },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (data.success) {
+        setFavourites(data.favourites);
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    }
+  };
+
   const value = {
     currency,
     navigate,
@@ -94,6 +129,9 @@ export const AppProvider = ({ children }) => {
     fetchUser,
     rooms,
     setRooms,
+    favourites,
+    toggleFavourite,
+    fetchFavourites,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

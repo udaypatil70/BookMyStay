@@ -4,8 +4,13 @@ import validate from "../middleware/validate.middleware.js";
 import {
   getUserData,
   storeRecentSearchedCities,
+  toggleFavourite,
+  getFavourites,
 } from "../controllers/user.controllers.js";
-import { storeRecentSearchSchema } from "../validations/schemas.js";
+import {
+  storeRecentSearchSchema,
+  toggleFavouriteSchema,
+} from "../validations/schemas.js";
 
 const userRouter = express.Router();
 
@@ -16,5 +21,12 @@ userRouter.post(
   validate(storeRecentSearchSchema),
   storeRecentSearchedCities,
 );
+userRouter.post(
+  "/toggle-favourite",
+  protect,
+  validate(toggleFavouriteSchema),
+  toggleFavourite,
+);
+userRouter.get("/favourites", protect, getFavourites);
 
 export default userRouter;

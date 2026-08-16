@@ -168,4 +168,133 @@ const toggleRoomAvailability = async (req, res) => {
   }
 };
 
-export { createRoom, getRooms, getOwnerRooms, toggleRoomAvailability };
+// API to update a room (owner only)
+const updateRoom = async (req, res) => {
+  try {
+    const { roomId, roomType, pricePerNight, amenities } = req.body;
+
+    if (!roomId) {
+      return res.status(400).json({ success: false, message: "Room ID is required" });
+    }
+
+    const roomData = await Room.findById(roomId);
+    if (!roomData) {
+      return res.status(404).json({ success: false, message: "Room not found" });
+    }
+
+    const hotel = await Hotel.findOne({ owner: req.user._id });
+    if (!hotel || roomData.hotel.toString() !== hotel._id.toString()) {
+      return res.status(403).json({ success: false, message: "Not authorized to modify this room" });
+    }
+
+    if (roomType) roomData.roomType = roomType;
+    if (pricePerNight) roomData.pricePerNight = Number(pricePerNight);
+    if (amenities) {
+      try {
+        roomData.amenities = typeof amenities === "string" ? JSON.parse(amenities) : amenities;
+      } catch {
+        roomData.amenities = amenities;
+      }
+    }
+
+    if (req.files && req.files.length > 0) {
+      const uploadImages = req.files.map(async (file) => {
+        const response = await cloudinary.uploader.upload(file.path);
+        return response.secure_url;
+      });
+      const newImages = await Promise.all(uploadImages);
+      roomData.images = [...roomData.images, ...newImages];
+    }
+
+    await roomData.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Room updated successfully",
+      room: roomData,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// API to delete a room (owner only)
+const deleteRoom = async (req, res) => {
+  try {
+    const { roomId } = req.body;
+
+    if (!roomId) {
+      return res.status(400).json({ success: false, message: "Room ID is required" });
+    }
+
+    const roomData = await Room.findById(roomId);
+    if (!roomData) {
+      return res.status(404).json({ success: false, message: "Room not found" });
+    }
+
+    const hotel = await Hotel.findOne({ owner: req.user._id });
+    if (!hotel || roomData.hotel.toString() !== hotel._id.toString()) {
+      return res.status(403).json({ success: false, message: "Not authorized to delete this room" });
+    }
+
+    const activeBooking = await Booking.findOne({
+      room: roomId,
+      status: { $in: ["confirmed", "pending"] },
+      checkOutDate: { $gte: new Date() },
+    });
+
+    if (activeBooking) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot delete room with active bookings",
+      });
+    }
+
+    await Room.findByIdAndDelete(roomId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Room deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// API to remove a room image (owner only)
+const removeRoomImage = async (req, res) => {
+  try {
+    const { roomId, imageUrl } = req.body;
+
+    if (!roomId || !imageUrl) {
+      return res.status(400).json({ success: false, message: "Room ID and image URL are required" });
+    }
+
+    const roomData = await Room.findById(roomId);
+    if (!roomData) {
+      return res.status(404).json({ success: false, message: "Room not found" });
+    }
+
+    const hotel = await Hotel.findOne({ owner: req.user._id });
+    if (!hotel || roomData.hotel.toString() !== hotel._id.toString()) {
+      return res.status(403).json({ success: false, message: "Not authorized" });
+    }
+
+    if (roomData.images.length <= 1) {
+      return res.status(400).json({ success: false, message: "Room must have at least one image" });
+    }
+
+    roomData.images = roomData.images.filter((img) => img !== imageUrl);
+    await roomData.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Image removed successfully",
+      room: roomData,
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export { createRoom, getRooms, getOwnerRooms, toggleRoomAvailability, updateRoom, deleteRoom, removeRoomImage };

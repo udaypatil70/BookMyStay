@@ -54,4 +54,60 @@ const storeRecentSearchedCities = async (req, res) => {
   }
 };
 
-export { getUserData, storeRecentSearchedCities };
+const toggleFavourite = async (req, res) => {
+  try {
+    const { hotelId } = req.body;
+
+    if (!hotelId) {
+      return res.status(400).json({
+        success: false,
+        message: "Hotel ID is required",
+      });
+    }
+
+    const user = req.user;
+    const index = user.favouriteHotels.indexOf(hotelId);
+
+    if (index > -1) {
+      user.favouriteHotels.splice(index, 1);
+      await user.save();
+      return res.status(200).json({
+        success: true,
+        message: "Removed from favourites",
+        favourites: user.favouriteHotels,
+      });
+    } else {
+      user.favouriteHotels.push(hotelId);
+      await user.save();
+      return res.status(200).json({
+        success: true,
+        message: "Added to favourites",
+        favourites: user.favouriteHotels,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const getFavourites = async (req, res) => {
+  try {
+    const user = req.user;
+    await user.populate("favouriteHotels");
+
+    return res.status(200).json({
+      success: true,
+      favourites: user.favouriteHotels,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export { getUserData, storeRecentSearchedCities, toggleFavourite, getFavourites };

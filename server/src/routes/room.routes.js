@@ -7,10 +7,15 @@ import {
   getOwnerRooms,
   getRooms,
   toggleRoomAvailability,
+  updateRoom,
+  deleteRoom,
+  removeRoomImage,
 } from "../controllers/room.controllers.js";
 import {
   createRoomSchema,
   toggleAvailabilitySchema,
+  updateRoomSchema,
+  deleteRoomSchema,
 } from "../validations/schemas.js";
 
 const roomRouter = express.Router();
@@ -29,6 +34,24 @@ roomRouter.post(
   ownerGuard,
   validate(toggleAvailabilitySchema),
   toggleRoomAvailability,
+);
+roomRouter.put(
+  "/update",
+  ownerGuard,
+  upload.array("images", 4),
+  validate(updateRoomSchema),
+  updateRoom,
+);
+roomRouter.delete(
+  "/delete",
+  ownerGuard,
+  validate(deleteRoomSchema),
+  deleteRoom,
+);
+roomRouter.post(
+  "/remove-image",
+  ownerGuard,
+  removeRoomImage,
 );
 
 export default roomRouter;

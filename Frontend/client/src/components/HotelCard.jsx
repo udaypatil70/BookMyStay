@@ -1,8 +1,23 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { assets } from "../assets/assets";
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 
 const HotelCard = ({ room, index }) => {
+  const { favourites, toggleFavourite, user } = useAppContext();
+  const isFavourite = favourites.includes(room.hotel._id);
+
+  const handleFavourite = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+      toast.error("Please login to add favourites");
+      return;
+    }
+    toggleFavourite(room.hotel._id);
+  };
+
   return (
     <Link
       to={`/rooms/${room._id}`}
@@ -13,6 +28,24 @@ const HotelCard = ({ room, index }) => {
       <div className="img-zoom">
         <img src={room.images[0]} alt={room.name} className="transition-transform duration-500" />
       </div>
+
+      <button
+        onClick={handleFavourite}
+        className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-md transition-all duration-300 hover:scale-110 hover:bg-white btn-press"
+      >
+        <svg
+          className={`w-5 h-5 transition-colors duration-300 ${
+            isFavourite ? "text-red-500 fill-red-500" : "text-gray-400"
+          }`}
+          fill={isFavourite ? "currentColor" : "none"}
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          strokeWidth="2"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </button>
+
       {index % 2 === 0 && (
         <p className="px-3 py-1 absolute top-3 left-3 text-xs bg-white text-gray-800 font-medium rounded-full shadow-md animate-bounce-in">
           Best Seller
