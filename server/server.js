@@ -3,6 +3,7 @@ import "dotenv/config";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import crypto from "crypto";
 import connectDB from "./src/config/db.config.js";
 import { clerkMiddleware } from "@clerk/express";
 import clerkWebhooks from "./src/controllers/clerkWebhooks.controllers.js";
@@ -26,10 +27,17 @@ connectCloudinary();
 // Security Middleware
 app.use(helmet());
 
+// Request ID — attach unique ID to every request for tracing
+app.use((req, res, next) => {
+  req.id = crypto.randomUUID();
+  res.setHeader("X-Request-Id", req.id);
+  next();
+});
+
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   message: {
     success: false,
     message: "Too many requests, please try again later.",
@@ -59,26 +67,70 @@ app.use(
   }),
 );
 
-// Stripe Webhook (must be before express.json)
+// Body size limits — prevent memory abuse
+const JSON_LIMIT = "1mb";
+const RAW_LIMIT = "5mb";
+
+// Stripe Webhook (must be before express.json — needs raw body)
 app.post(
   "/api/bookings/stripe-webhook",
-  express.raw({ type: "application/json" }),
+  express.raw({ type: "application/json", limit: RAW_LIMIT }),
   stripeWebhook,
 );
 
-// API to listen to Clerk Webhooks
+// Clerk Webhook (needs raw body)
 app.post(
   "/api/clerk",
-  express.raw({ type: "application/json" }),
+  express.raw({ type: "application/json", limit: RAW_LIMIT }),
   clerkWebhooks,
 );
 
-app.use(express.json());
+app.use(express.json({ limit: JSON_LIMIT }));
+app.use(express.urlencoded({ extended: true, limit: JSON_LIMIT }));
 app.use(clerkMiddleware());
+
+// Request logging (dev-friendly, non-production-safe)
+if (process.env.NODE_ENV !== "production") {
+  app.use((req, res, next) => {
+    const start = Date.now();
+    res.on("finish", () => {
+      const duration = Date.now() - start;
+      const status = res.statusCode;
+      const color = status >= 400 ? "\x1b[31m" : status >= 300 ? "\x1b[33m" : "\x1b[32m";
+      console.log(
+        `${color}${req.method}\x1b[0m ${req.originalUrl} ${color}${status}\x1b[0m ${duration}ms [${req.id}]`,
+      );
+    });
+    next();
+  });
+}
 
 // Routes
 app.get("/", (req, res) => {
-  res.send("API is Working");
+  res.json({
+    success: true,
+    message: "BookMyStay API is running",
+    version: "1.0.0",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Health check — no auth, no rate limit
+app.get("/health", async (req, res) => {
+  const mongoose = (await import("mongoose")).default;
+  const dbStatus = mongoose.connection.readyState === 1 ? "connected" : "disconnected";
+
+  res.status(200).json({
+    success: true,
+    status: "healthy",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    database: dbStatus,
+    memory: {
+      rss: Math.round(process.memoryUsage().rss / 1024 / 1024) + "MB",
+      heap: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + "MB",
+    },
+  });
 });
 
 app.use("/api/user", authLimiter, userRouter);
@@ -94,16 +146,18 @@ app.use("/api", publicRouter);
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: "Route not found",
+    message: `Route ${req.method} ${req.originalUrl} not found`,
   });
 });
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error("Unhandled Error:", err);
-  res.status(500).json({
+  console.error(`[${req.id || "no-id"}] Unhandled Error:`, err);
+  res.status(err.statusCode || 500).json({
     success: false,
-    message: "Internal server error",
+    message: process.env.NODE_ENV === "production"
+      ? "Internal server error"
+      : err.message,
   });
 });
 
@@ -111,6 +165,27 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 // Start Server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+// Graceful shutdown
+const shutdown = async (signal) => {
+  console.log(`\n${signal} received. Shutting down gracefully...`);
+  server.close(async () => {
+    console.log("HTTP server closed.");
+    const mongoose = (await import("mongoose")).default;
+    await mongoose.connection.close(false);
+    console.log("Database connection closed.");
+    process.exit(0);
+  });
+
+  // Force shutdown after 10 seconds
+  setTimeout(() => {
+    console.error("Forced shutdown after timeout.");
+    process.exit(1);
+  }, 10000);
+};
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));

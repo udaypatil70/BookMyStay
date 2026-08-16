@@ -30,10 +30,12 @@ const getAdminStats = async (req, res) => {
       Booking.find({ status: { $ne: "cancelled" } })
         .populate("room hotel user")
         .sort({ createdAt: -1 })
-        .limit(10),
+        .limit(10)
+        .lean(),
       Contact.find()
         .sort({ createdAt: -1 })
-        .limit(10),
+        .limit(10)
+        .lean(),
     ]);
 
     // Revenue stats
@@ -109,7 +111,8 @@ const getContacts = async (req, res) => {
     const contacts = await Contact.find(filter)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
-      .limit(Number(limit));
+      .limit(Number(limit))
+      .lean();
 
     return res.status(200).json({
       success: true,
@@ -175,7 +178,8 @@ const getNewsletterSubscribers = async (req, res) => {
     const subscribers = await Newsletter.find({ subscribed: true })
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
-      .limit(Number(limit));
+      .limit(Number(limit))
+      .lean();
 
     return res.status(200).json({
       success: true,
@@ -225,7 +229,8 @@ const getUsers = async (req, res) => {
       .select("-favouriteHotels -recentSearchedCities")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
-      .limit(Number(limit));
+      .limit(Number(limit))
+      .lean();
 
     return res.status(200).json({
       success: true,
@@ -275,7 +280,8 @@ const getAdminHotels = async (req, res) => {
       .populate("owner", "username email image")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
-      .limit(Number(limit));
+      .limit(Number(limit))
+      .lean();
 
     return res.status(200).json({
       success: true,

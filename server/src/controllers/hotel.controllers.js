@@ -57,7 +57,7 @@ const getHotelById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const hotel = await Hotel.findById(id).populate("owner", "username image");
+    const hotel = await Hotel.findById(id).populate("owner", "username image").lean();
 
     if (!hotel) {
       return res.status(404).json({
@@ -154,7 +154,8 @@ const getAllHotels = async (req, res) => {
       .populate("owner", "username image")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
-      .limit(Number(limit));
+      .limit(Number(limit))
+      .lean();
 
     return res.status(200).json({
       success: true,

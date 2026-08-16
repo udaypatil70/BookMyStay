@@ -168,7 +168,8 @@ const getUserBookings = async (req, res) => {
 
     const bookings = await Booking.find({ user })
       .populate("room hotel")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     return res.status(200).json({
       success: true,
@@ -201,7 +202,8 @@ const getHotelBookings = async (req, res) => {
       hotel: hotel._id,
     })
       .populate("room hotel user")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     // Total bookings (exclude cancelled)
     const totalBookings = bookings.filter(

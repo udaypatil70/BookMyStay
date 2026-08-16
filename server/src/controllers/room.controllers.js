@@ -67,7 +67,8 @@ const getRooms = async (req, res) => {
           select: "image",
         },
       })
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     // If dates are provided, filter out rooms that are booked for those dates
     if (checkInDate && checkOutDate) {
@@ -115,7 +116,7 @@ const getOwnerRooms = async (req, res) => {
 
     const rooms = await Room.find({
       hotel: hotelData._id,
-    }).populate("hotel");
+    }).populate("hotel").lean();
 
     return res.status(200).json({
       success: true,

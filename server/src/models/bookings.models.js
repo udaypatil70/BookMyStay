@@ -33,6 +33,7 @@ const bookingSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 1,
+      max: 10,
     },
     status: {
       type: String,
@@ -53,6 +54,11 @@ const bookingSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+bookingSchema.index({ user: 1, status: 1 });
+bookingSchema.index({ hotel: 1, status: 1 });
+bookingSchema.index({ room: 1, status: 1, checkInDate: 1, checkOutDate: 1 });
+bookingSchema.index({ createdAt: -1 });
 
 const Booking = mongoose.model("Booking", bookingSchema);
 

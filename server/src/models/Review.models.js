@@ -34,6 +34,8 @@ const reviewSchema = new mongoose.Schema(
 );
 
 reviewSchema.index({ room: 1, user: 1 }, { unique: true });
+reviewSchema.index({ hotel: 1, createdAt: -1 });
+reviewSchema.index({ room: 1, createdAt: -1 });
 
 const Review = mongoose.model("Review", reviewSchema);
 

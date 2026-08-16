@@ -90,7 +90,8 @@ const getRoomReviews = async (req, res) => {
 
     const reviews = await Review.find({ room: roomId })
       .populate("user", "username image")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     const totalReviews = reviews.length;
     const avgRating =
@@ -118,7 +119,8 @@ const getHotelReviews = async (req, res) => {
 
     const reviews = await Review.find({ hotel: hotelId })
       .populate("user", "username image")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     const totalReviews = reviews.length;
     const avgRating =

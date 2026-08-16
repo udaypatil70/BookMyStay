@@ -227,7 +227,8 @@ const getFeaturedRooms = async (req, res) => {
         },
       })
       .sort({ createdAt: -1 })
-      .limit(6);
+      .limit(6)
+      .lean();
 
     return res.status(200).json({
       success: true,
@@ -252,7 +253,7 @@ const getRoomById = async (req, res) => {
         path: "owner",
         select: "image username",
       },
-    });
+    }).lean();
 
     if (!room) {
       return res.status(404).json({
