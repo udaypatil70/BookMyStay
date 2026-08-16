@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { assets } from "../assets/assets";
 import { useClerk, UserButton } from "@clerk/react";
 import { useAppContext } from "../context/AppContext";
 
@@ -124,14 +123,6 @@ const Navbar = () => {
 
       {/* Right Side */}
       <div className="hidden md:flex items-center gap-4">
-        <button onClick={() => { navigate("/rooms"); scrollTo(0, 0); }}>
-          <img
-            src={assets.searchIcon}
-            alt="Search"
-            className={`h-7 ${isScrolled ? "invert" : ""}`}
-          />
-        </button>
-
         {user ? (
           <UserButton>
             <UserButton.MenuItems>
@@ -169,7 +160,7 @@ const Navbar = () => {
         )}
 
         <img
-          src={assets.menuIcon}
+          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'/%3E%3C/svg%3E"
           alt="Menu"
           className={`h-5 cursor-pointer ${isScrolled ? "invert" : ""}`}
           onClick={() => setIsMenuOpen(true)}
@@ -186,7 +177,9 @@ const Navbar = () => {
           className="absolute top-5 right-5 transition-transform duration-300 hover:rotate-90"
           onClick={() => setIsMenuOpen(false)}
         >
-          <img src={assets.closeMenu} alt="Close" className="h-6" />
+          <svg className="h-6 w-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
 
         {navLinks.map((link, index) => {
