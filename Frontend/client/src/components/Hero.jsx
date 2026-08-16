@@ -54,22 +54,25 @@ const Hero = () => {
       className="flex flex-col items-start justify-center px-6 md:px-16 lg:px-24 xl:px-32 pt-28 h-screen bg-cover bg-center bg-no-repeat text-white"
       style={{ backgroundImage: `url(${heroImage})` }}
     >
-      <p className="bg-[#49B9FF]/50 px-3.5 py-1 rounded-full">
-        The Ultimate Hotel Experience
-      </p>
+      <div className="animate-fade-in-up">
+        <p className="bg-[#49B9FF]/50 px-3.5 py-1 rounded-full inline-block backdrop-blur-sm">
+          The Ultimate Hotel Experience
+        </p>
+      </div>
 
-      <h1 className="font-playfair mt-4 max-w-2xl text-3xl font-bold leading-tight md:text-6xl md:leading-[70px] md:font-extrabold">
+      <h1 className="font-playfair mt-4 max-w-2xl text-3xl font-bold leading-tight md:text-6xl md:leading-[70px] md:font-extrabold animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
         Discover Your Perfect Getaway Destination
       </h1>
 
-      <p className="mt-4 max-w-xl text-sm md:text-base">
+      <p className="mt-4 max-w-xl text-sm md:text-base animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
         Unparalleled luxury and comfort await at the world's most exclusive
         hotels and resorts. Start your journey today.
       </p>
 
       <form
         onSubmit={onSearch}
-        className="mt-8 flex flex-col gap-4 rounded-xl bg-white px-6 py-4 text-gray-600 shadow-lg md:flex-row md:items-end"
+        className="mt-8 flex flex-col gap-4 rounded-xl bg-white px-6 py-4 text-gray-600 shadow-lg md:flex-row md:items-end animate-slide-in-bottom"
+        style={{ animationDelay: '0.3s' }}
       >
         {/* Destination */}
         <div>
@@ -85,7 +88,7 @@ const Hero = () => {
             id="destinationInput"
             type="text"
             placeholder="Type here"
-            className="mt-2 rounded border border-gray-300 px-3 py-2 text-sm outline-none"
+            className="mt-2 rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
             required
           />
 
@@ -109,7 +112,7 @@ const Hero = () => {
             value={checkIn}
             onChange={(e) => setCheckIn(e.target.value)}
             min={new Date().toISOString().split("T")[0]}
-            className="mt-2 rounded border border-gray-300 px-3 py-2 text-sm outline-none"
+            className="mt-2 rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
           />
         </div>
 
@@ -127,7 +130,7 @@ const Hero = () => {
             onChange={(e) => setCheckOut(e.target.value)}
             min={checkIn || new Date().toISOString().split("T")[0]}
             disabled={!checkIn}
-            className="mt-2 rounded border border-gray-300 px-3 py-2 text-sm outline-none"
+            className="mt-2 rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300 disabled:opacity-50"
           />
         </div>
 
@@ -143,14 +146,14 @@ const Hero = () => {
             value={guests}
             onChange={(e) => setGuests(e.target.value)}
             placeholder="1"
-            className="mt-2 w-20 rounded border border-gray-300 px-3 py-2 text-sm outline-none"
+            className="mt-2 w-20 rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
           />
         </div>
 
         {/* Search Button */}
         <button
           type="submit"
-          className="flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-black px-6 py-3 text-white transition hover:bg-gray-800"
+          className="flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-black px-6 py-3 text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-lg hover:shadow-black/20 btn-press"
         >
           <img src={assets.searchIcon} alt="Search" className="h-5" />
           Search

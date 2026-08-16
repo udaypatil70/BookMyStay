@@ -194,18 +194,46 @@ const AllRooms = () => {
         </div>
 
         {loading ? (
-          <div className="py-20 text-center text-gray-500">
-            Loading rooms...
+          <div className="space-y-10">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex flex-col md:flex-row items-start py-10 gap-6 border-b border-gray-300">
+                <div className="skeleton h-65 md:w-1/2 rounded-xl" />
+                <div className="md:w-1/2 flex flex-col gap-3">
+                  <div className="skeleton h-4 w-24" />
+                  <div className="skeleton h-8 w-48" />
+                  <div className="skeleton h-4 w-32" />
+                  <div className="skeleton h-4 w-64" />
+                  <div className="flex gap-3 mt-3">
+                    <div className="skeleton h-8 w-24 rounded-lg" />
+                    <div className="skeleton h-8 w-24 rounded-lg" />
+                    <div className="skeleton h-8 w-24 rounded-lg" />
+                  </div>
+                  <div className="skeleton h-6 w-28 mt-4" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : filteredRooms.length === 0 ? (
-          <div className="py-20 text-center text-gray-500">
-            No rooms found matching your criteria. Try adjusting your filters.
+          <div className="py-20 text-center animate-fade-in-up">
+            <div className="text-6xl mb-4">🔍</div>
+            <p className="text-gray-500 text-lg mb-2">No rooms found</p>
+            <p className="text-gray-400 text-sm mb-6">Try adjusting your filters or search criteria.</p>
+            <button
+              onClick={clearFilters}
+              className="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-full font-medium transition-all duration-300 hover:bg-gray-800 hover:shadow-lg btn-press"
+            >
+              Clear Filters
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
           </div>
         ) : (
-          filteredRooms.map((room) => (
+          filteredRooms.map((room, index) => (
             <div
               key={room._id}
-              className="flex flex-col md:flex-row items-start py-10 gap-6 border-b border-gray-300 last:pb-30 last:border-0"
+              className="flex flex-col md:flex-row items-start py-10 gap-6 border-b border-gray-300 last:pb-30 last:border-0 animate-fade-in-up hover:bg-gray-50/50 transition-colors duration-300 rounded-xl px-2"
+              style={{ animationDelay: `${index * 0.05}s` }}
             >
               <img
                 onClick={() => {
@@ -215,7 +243,7 @@ const AllRooms = () => {
                 src={room.images[0]}
                 alt="hotel-img"
                 title="View Room Details"
-                className="max-h-65 md:w-1/2 rounded-xl shadow-lg object-cover cursor-pointer"
+                className="max-h-65 md:w-1/2 rounded-xl shadow-lg object-cover cursor-pointer img-zoom"
               />
               <div className="md:w-1/2 flex flex-col gap-2">
                 <p className="text-gray-500">{room.hotel.city}</p>
@@ -224,7 +252,7 @@ const AllRooms = () => {
                     navigate(`/rooms/${room._id}`);
                     scrollTo(0, 0);
                   }}
-                  className="text-gray-500 text-3xl font-playfair"
+                  className="text-gray-500 text-3xl font-playfair cursor-pointer hover:text-primary transition-colors duration-300"
                 >
                   {room.hotel.name}
                 </p>
@@ -232,7 +260,7 @@ const AllRooms = () => {
                   <StarRating />
                   <p className="ml-2">200+ Reviews</p>
                 </div>
-                <div className="flex item-center gap-1 text-gray-500 mt-2 text-sm">
+                <div className="flex items-center gap-1 text-gray-500 mt-2 text-sm">
                   <img src={assets.locationIcon} alt="location-icon" />
                   <span>{room.hotel.address}</span>
                 </div>
@@ -241,7 +269,7 @@ const AllRooms = () => {
                   {room.amenities.map((item, index) => (
                     <div
                       key={index}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F5F5FF]/70"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F5F5FF]/70 transition-all duration-300 hover:bg-primary/10 cursor-default"
                     >
                       <img
                         src={facilityIcons[item]}

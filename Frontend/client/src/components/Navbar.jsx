@@ -166,22 +166,26 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed top-0 left-0 h-screen w-full bg-white flex flex-col items-center justify-center gap-6 transition-transform duration-500 ${
+        className={`fixed top-0 left-0 h-screen w-full bg-white flex flex-col items-center justify-center gap-8 transition-transform duration-500 ease-out ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <button
-          className="absolute top-5 right-5"
+          className="absolute top-5 right-5 transition-transform duration-300 hover:rotate-90"
           onClick={() => setIsMenuOpen(false)}
         >
           <img src={assets.closeMenu} alt="Close" className="h-6" />
         </button>
 
-        {navLinks.map((link) => (
+        {navLinks.map((link, index) => (
           <Link
             key={link.name}
             to={link.path}
             onClick={() => setIsMenuOpen(false)}
+            className="text-xl font-medium text-gray-800 hover:text-primary transition-colors duration-300"
+            style={{
+              animationDelay: isMenuOpen ? `${index * 0.1}s` : '0s'
+            }}
           >
             {link.name}
           </Link>
@@ -189,7 +193,7 @@ const Navbar = () => {
 
         {user && (
           <button
-            className="border rounded-full px-4 py-1 text-sm font-;ight cursor-pointer transition-all "
+            className="border rounded-full px-6 py-2 text-sm font-medium cursor-pointer transition-all duration-300 hover:bg-black hover:text-white btn-press"
             onClick={() => {
               isOwner ? navigate("/owner") : setShowHotelReg(true);
             }}
@@ -201,7 +205,7 @@ const Navbar = () => {
         {!user && (
           <button
             onClick={() => openSignIn()}
-            className="rounded-full bg-black px-8 py-2.5 text-white transition-all duration-500"
+            className="rounded-full bg-black px-8 py-2.5 text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-lg btn-press"
           >
             Login
           </button>

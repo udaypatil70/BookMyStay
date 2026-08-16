@@ -1,16 +1,15 @@
 import React from "react";
 import Title from "./Title";
 import { assets, exclusiveOffers } from "../assets/assets";
-// import {exclusiveOffers} from "../assets/exclusiveOffers";
 
 const ExclusiveOffers = () => {
   return (
-    <div className="flex flex-col items-center px-6 md:px-16 lg:px0-24 xl:px-32 pt-20 pb-30">
-      <div className="flex flex-col md:flex-row item-center justify-between w-full ">
+    <div className="flex flex-col items-center px-6 md:px-16 lg:px-24 xl:px-32 pt-20 pb-30">
+      <div className="flex flex-col md:flex-row items-center justify-between w-full">
         <Title
           align="left"
           title="Exclusive Offers"
-          subtitle="Take Advantage of our limited-time offers and special package to enhance your stay and create unforgettable memories"
+          subtitle="Take advantage of our limited-time offers and special packages to enhance your stay and create unforgettable memories."
         />
         <button className="group flex items-center gap-2 font-medium cursor-pointer whitespace-nowrap">
           <span>View All Offers</span>
@@ -22,27 +21,28 @@ const ExclusiveOffers = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12 w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12 w-full stagger-children">
         {exclusiveOffers.map((item) => (
           <div
             key={item._id}
-            className="group relative flex flex-col item-start justify-between gap-1 pt-12 md:pt-18 px-4 rounded-xl text-white bg-no-repeat bg-cover bg-center"
+            className="group relative flex flex-col items-start justify-between gap-1 pt-12 md:pt-18 px-4 rounded-xl text-white bg-no-repeat bg-cover bg-center overflow-hidden hover-lift"
             style={{ backgroundImage: `url(${item.image})` }}
           >
-            <p className="px-3 py-1 absolute top-4 left-4 text-xs bg-white text-gray-800 font-medium rounded-full">
-              {item.priceoff}% OFF
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 rounded-xl" />
+            <p className="px-3 py-1 absolute top-4 left-4 text-xs bg-white text-gray-800 font-medium rounded-full shadow-md z-10">
+              {item.priceOff}% OFF
             </p>
-            <div>
+            <div className="relative z-10">
               <p className="text-2xl font-medium font-playfair">{item.title}</p>
               <p>{item.description}</p>
               <p className="text-xs text-white/70 mt-3">
-                Expires {item.ExpiryDate}
+                Expires {item.expiryDate}
               </p>
             </div>
-            <button className="flex item-center gap-2 font-medium cursor-pointer mt-4 mb-5">
+            <button className="relative z-10 flex items-center gap-2 font-medium cursor-pointer mt-4 mb-5 group/btn">
               View Offers
               <img
-                className="invert group-hover:translate-x-1 transition-all"
+                className="invert group-hover/btn:translate-x-1 transition-all duration-300"
                 src={assets.arrowIcon}
                 alt="Arrow-Icon"
               />

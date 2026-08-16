@@ -8,17 +8,33 @@ const contactOptions = [
     value: "+1 (800) 555-0148",
     description:
       "Speak with our concierge team anytime for reservations and special requests.",
+    icon: (
+      <svg className="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+      </svg>
+    ),
   },
   {
     title: "Email",
     value: "support@bookmystay.com",
     description: "Send a note for bookings, packages, or group stays.",
+    icon: (
+      <svg className="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+    ),
   },
   {
     title: "Visit",
     value: "12 Ocean Avenue, Dubai",
     description:
       "Meet us at our luxury experience center for planning assistance.",
+    icon: (
+      <svg className="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    ),
   },
 ];
 
@@ -32,7 +48,7 @@ const Contact = () => {
         />
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-[2rem] bg-white p-8 shadow-sm md:p-10">
+          <div className="rounded-[2rem] bg-white p-8 shadow-sm md:p-10 hover-lift">
             <p className="text-sm font-medium uppercase tracking-[0.25em] text-sky-600">
               Get in touch
             </p>
@@ -49,13 +65,16 @@ const Contact = () => {
               {contactOptions.map((item) => (
                 <div
                   key={item.title}
-                  className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                  className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all duration-300 hover:bg-slate-100 hover:border-slate-300"
                 >
-                  <p className="text-sm font-semibold text-gray-900">
-                    {item.title}
-                  </p>
-                  <p className="mt-1 text-sm text-sky-600">{item.value}</p>
-                  <p className="mt-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-3">
+                    {item.icon}
+                    <p className="text-sm font-semibold text-gray-900">
+                      {item.title}
+                    </p>
+                  </div>
+                  <p className="mt-2 ml-8 text-sm text-sky-600 font-medium">{item.value}</p>
+                  <p className="mt-1 ml-8 text-sm text-gray-600">
                     {item.description}
                   </p>
                 </div>
@@ -63,7 +82,7 @@ const Contact = () => {
             </div>
           </div>
 
-          <div className="rounded-[2rem] bg-gradient-to-br from-slate-900 to-slate-700 p-8 text-white shadow-sm md:p-10">
+          <div className="rounded-[2rem] bg-gradient-to-br from-slate-900 to-slate-700 p-8 text-white shadow-sm md:p-10 hover-lift">
             <p className="text-sm uppercase tracking-[0.25em] text-slate-300">
               Quick enquiry
             </p>
@@ -71,19 +90,19 @@ const Contact = () => {
               <input
                 type="text"
                 placeholder="Your name"
-                className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-300"
+                className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-300 focus:border-white/30 focus:bg-white/15 transition-all duration-300"
               />
               <input
                 type="email"
                 placeholder="Your email"
-                className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-300"
+                className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-300 focus:border-white/30 focus:bg-white/15 transition-all duration-300"
               />
               <textarea
                 rows="4"
                 placeholder="Tell us what you need"
-                className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-300"
+                className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-300 focus:border-white/30 focus:bg-white/15 transition-all duration-300"
               />
-              <button className="rounded-full bg-white px-5 py-2 text-sm font-medium text-slate-900 transition hover:bg-slate-100">
+              <button className="rounded-full bg-white px-6 py-2.5 text-sm font-medium text-slate-900 transition-all duration-300 hover:bg-slate-100 hover:shadow-lg btn-press">
                 Send Request
               </button>
             </form>
@@ -92,9 +111,12 @@ const Contact = () => {
               <p>Prefer browsing first?</p>
               <Link
                 to="/rooms"
-                className="mt-2 inline-block font-medium text-white"
+                className="mt-2 inline-flex items-center gap-2 font-medium text-white transition-all duration-300 hover:text-sky-300"
               >
-                Explore our rooms →
+                Explore our rooms
+                <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
               </Link>
             </div>
           </div>

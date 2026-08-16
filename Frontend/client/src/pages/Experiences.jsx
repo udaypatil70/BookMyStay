@@ -51,12 +51,14 @@ const Experiences = () => {
         />
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="overflow-hidden rounded-3xl bg-white shadow-sm">
-            <img
-              src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1400&q=80"
-              alt="Luxury resort experience"
-              className="h-[420px] w-full object-cover"
-            />
+          <div className="overflow-hidden rounded-3xl bg-white shadow-sm hover-lift">
+            <div className="img-zoom">
+              <img
+                src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1400&q=80"
+                alt="Luxury resort experience"
+                className="h-[420px] w-full object-cover transition-transform duration-700"
+              />
+            </div>
             <div className="p-8">
               <p className="text-sm font-medium uppercase tracking-[0.25em] text-sky-600">
                 Signature Stay
@@ -64,26 +66,26 @@ const Experiences = () => {
               <h2 className="mt-3 font-playfair text-3xl text-gray-900">
                 Experience luxury beyond the room
               </h2>
-              <p className="mt-4 max-w-2xl text-base text-gray-600">
+              <p className="mt-4 max-w-2xl text-base text-gray-600 leading-relaxed">
                 From private beach dinners to guided excursions, every detail is
                 designed to turn your travel into a story worth remembering.
               </p>
-              <button className="mt-6 rounded-full border border-gray-300 bg-white px-5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
+              <button className="mt-6 rounded-full border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-all duration-300 hover:bg-gray-50 hover:border-gray-400 btn-press">
                 Book an Experience
               </button>
             </div>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-5 stagger-children">
             {experiences.map((item) => (
               <div
                 key={item.id}
-                className="flex gap-4 rounded-2xl bg-white p-3 shadow-sm"
+                className="flex gap-4 rounded-2xl bg-white p-3 shadow-sm hover-lift cursor-pointer"
               >
                 <img
                   src={item.image}
                   alt={item.title}
-                  className="h-24 w-24 rounded-xl object-cover"
+                  className="h-24 w-24 rounded-xl object-cover img-zoom"
                 />
                 <div>
                   <p className="text-sm font-medium text-sky-600">
@@ -101,7 +103,7 @@ const Experiences = () => {
           </div>
         </div>
 
-        <div className="mt-16 rounded-[2rem] bg-white p-8 shadow-sm md:p-10">
+        <div className="mt-16 rounded-[2rem] bg-white p-8 shadow-sm md:p-10 hover-lift">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-sm font-medium uppercase tracking-[0.25em] text-sky-600">
@@ -111,22 +113,24 @@ const Experiences = () => {
                 Pair your experience with an exceptional room
               </h3>
             </div>
-            <button className="rounded-full bg-black px-5 py-2 text-sm font-medium text-white transition hover:bg-gray-800">
+            <button className="rounded-full bg-black px-6 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-lg hover:shadow-black/20 btn-press">
               Explore Rooms
             </button>
           </div>
 
-          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            {roomsDummyData.map((room, index) => (
+          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4 stagger-children">
+            {roomsDummyData.map((room) => (
               <div
                 key={room._id}
-                className="overflow-hidden rounded-2xl border border-gray-100 bg-slate-50"
+                className="overflow-hidden rounded-2xl border border-gray-100 bg-slate-50 hover-lift"
               >
-                <img
-                  src={room.images[0]}
-                  alt={room.roomType}
-                  className="h-40 w-full object-cover"
-                />
+                <div className="img-zoom">
+                  <img
+                    src={room.images[0]}
+                    alt={room.roomType}
+                    className="h-40 w-full object-cover"
+                  />
+                </div>
                 <div className="p-4">
                   <div className="flex items-center justify-between">
                     <p className="font-playfair text-lg text-gray-900">

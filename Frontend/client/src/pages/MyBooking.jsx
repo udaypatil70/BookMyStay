@@ -141,7 +141,7 @@ const MyBooking = () => {
     <div className="py-28 md:pb-35 md:pt-32 px-4 md:px-16 lg:px-24 xl:px-32">
       <Title
         title="My Bookings"
-        subtitle="Easily manage your past, current, and upcoming hotel reservations in one place. Plan your trips seamlessly with just a few clicks"
+        subtitle="Easily manage your past, current, and upcoming hotel reservations in one place. Plan your trips seamlessly with just a few clicks."
         align="left"
       />
 
@@ -154,25 +154,65 @@ const MyBooking = () => {
         </div>
 
         {loading ? (
-          <div className="py-10 text-center text-gray-500">
-            Loading bookings...
+          <div className="space-y-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="grid grid-cols-1 md:grid-cols-[3fr_2fr_1fr_1fr] w-full border-b border-gray-300 py-6 first:border-t">
+                <div className="flex flex-col md:flex-row">
+                  <div className="skeleton min-md:w-44 h-32 rounded" />
+                  <div className="flex flex-col gap-2 max-md:mt-3 min-md:ml-4">
+                    <div className="skeleton h-6 w-40" />
+                    <div className="skeleton h-4 w-32" />
+                    <div className="skeleton h-4 w-24" />
+                    <div className="skeleton h-4 w-20" />
+                  </div>
+                </div>
+                <div className="flex flex-row md:items-center md:gap-12 mt-3 gap-8">
+                  <div>
+                    <div className="skeleton h-4 w-16 mb-1" />
+                    <div className="skeleton h-3 w-28" />
+                  </div>
+                  <div>
+                    <div className="skeleton h-4 w-16 mb-1" />
+                    <div className="skeleton h-3 w-28" />
+                  </div>
+                </div>
+                <div className="flex flex-col items-start justify-center pt-3">
+                  <div className="skeleton h-6 w-20 rounded-full" />
+                </div>
+                <div className="flex flex-col items-start justify-center pt-3 gap-2">
+                  <div className="skeleton h-7 w-20 rounded-full" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : bookings.length === 0 ? (
-          <div className="py-10 text-center text-gray-500">
-            No bookings found. Start by exploring our rooms!
+          <div className="py-20 text-center animate-fade-in-up">
+            <div className="text-6xl mb-4">🏨</div>
+            <p className="text-gray-500 text-lg mb-2">No bookings found</p>
+            <p className="text-gray-400 text-sm mb-6">Start by exploring our rooms!</p>
+            <a
+              href="/rooms"
+              className="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-full font-medium transition-all duration-300 hover:bg-gray-800 hover:shadow-lg btn-press"
+            >
+              Explore Rooms
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
           </div>
         ) : (
-          bookings.map((booking) => (
+          bookings.map((booking, index) => (
             <div
               key={booking._id}
-              className="grid grid-cols-1 md:grid-cols-[3fr_2fr_1fr_1fr] w-full border-b border-gray-300 py-6 first:border-t"
+              className="grid grid-cols-1 md:grid-cols-[3fr_2fr_1fr_1fr] w-full border-b border-gray-300 py-6 first:border-t animate-fade-in-up hover:bg-gray-50/50 transition-colors duration-300"
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
               {/* Hotel Details */}
               <div className="flex flex-col md:flex-row">
                 <img
                   src={booking.room?.images?.[0]}
                   alt="hotel-img"
-                  className="min-md:w-44 rounded shadow object-cover"
+                  className="min-md:w-44 rounded shadow object-cover img-zoom"
                 />
                 <div className="flex flex-col gap-1.5 max-md:mt-3 min-md:ml-4">
                   <p className="font-playfair text-2xl">
@@ -181,11 +221,11 @@ const MyBooking = () => {
                       ({booking.room?.roomType})
                     </span>
                   </p>
-                  <div className="flex item-center gap-1 text-sm text-gray-500">
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
                     <img src={assets.locationIcon} alt="location-icon" />
                     <span>{booking.hotel?.address}</span>
                   </div>
-                  <div className="flex item-center gap-1 text-sm text-gray-500">
+                  <div className="flex items-center gap-1 text-sm text-gray-500">
                     <img src={assets.guestsIcon} alt="Guest-icon" />
                     <span>{booking.guests} Guest{booking.guests > 1 ? "s" : ""}</span>
                   </div>
@@ -215,7 +255,7 @@ const MyBooking = () => {
               {/* Status */}
               <div className="flex flex-col items-start justify-center pt-3">
                 <span
-                  className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(booking.status, booking.isPaid)}`}
+                  className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold transition-all duration-300 ${getStatusColor(booking.status, booking.isPaid)}`}
                 >
                   {getStatusLabel(booking.status, booking.isPaid)}
                 </span>
@@ -229,7 +269,7 @@ const MyBooking = () => {
                 {canPay(booking) && (
                   <button
                     onClick={() => handlePayment(booking._id)}
-                    className="px-4 py-1.5 text-xs bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all cursor-pointer"
+                    className="px-4 py-1.5 text-xs bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-blue-500/30 btn-press"
                   >
                     Pay Now
                   </button>
@@ -237,7 +277,7 @@ const MyBooking = () => {
                 {canCancel(booking) && (
                   <button
                     onClick={() => cancelBooking(booking._id)}
-                    className="px-4 py-1.5 text-xs border border-red-400 text-red-500 rounded-full hover:bg-red-50 transition-all cursor-pointer"
+                    className="px-4 py-1.5 text-xs border border-red-400 text-red-500 rounded-full hover:bg-red-50 transition-all duration-300 cursor-pointer btn-press"
                   >
                     Cancel Booking
                   </button>

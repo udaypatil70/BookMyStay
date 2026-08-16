@@ -104,36 +104,36 @@ const RoomDetails = () => {
     room && (
       <div className="py-28 md:py-35 px-4 md:px-16 lg:px-24 xl:px-32">
         {/* Room Details */}
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-2">
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-2 animate-fade-in-up">
           <h1 className="text-3xl md:text-4xl font-playfair">
             {room.hotel.name}
             <span className="font-inter text-sm"> ({room.roomType})</span>
           </h1>
-          <p className="text-xs font-inter py-1.5 px-3 text-white bg-orange-500 rounded-full">
+          <p className="text-xs font-inter py-1.5 px-3 text-white bg-orange-500 rounded-full animate-pulse-glow">
             20% OFF
           </p>
         </div>
 
         {/* Room Rating */}
-        <div className="flex items-center gap-1 mt-2">
+        <div className="flex items-center gap-1 mt-2 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           <StarRating />
           <p className="ml-2">200+ Reviews</p>
         </div>
 
         {/* Room Address */}
-        <div className="flex items-center gap-2 text-gray-500 mt-2">
+        <div className="flex items-center gap-2 text-gray-500 mt-2 animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
           <img src={assets.locationIcon} alt="location-icon" />
           <span>{room.hotel.address}</span>
         </div>
 
         {/* Room Images */}
-        <div className="flex flex-col lg:flex-row mt-6 gap-6">
+        <div className="flex flex-col lg:flex-row mt-6 gap-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           {/* Main Image */}
-          <div className="lg:w-1/2 w-full">
+          <div className="lg:w-1/2 w-full img-zoom rounded-xl overflow-hidden">
             <img
               src={mainImage}
               alt="Room"
-              className="w-full rounded-xl shadow-lg object-cover"
+              className="w-full shadow-lg object-cover transition-transform duration-500"
             />
           </div>
 
@@ -145,8 +145,8 @@ const RoomDetails = () => {
                 src={image}
                 alt={`Room ${index + 1}`}
                 onClick={() => setMainImage(image)}
-                className={`w-full rounded-xl shadow-md object-cover cursor-pointer ${
-                  mainImage === image ? "outline-4 outline-orange-500" : ""
+                className={`w-full rounded-xl shadow-md object-cover cursor-pointer transition-all duration-300 ${
+                  mainImage === image ? "outline-4 outline-orange-500 scale-[1.02]" : "hover:scale-[1.02] hover:shadow-lg"
                 }`}
               />
             ))}
@@ -154,7 +154,7 @@ const RoomDetails = () => {
         </div>
 
         {/* Room Highlights */}
-        <div className="flex flex-col md:flex-row md:justify-between mt-10">
+        <div className="flex flex-col md:flex-row md:justify-between mt-10 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
           <div className="flex flex-col">
             <h1 className="text-3xl md:text-4xl font-playfair">
               Experience Luxury Like Never Before
@@ -164,7 +164,7 @@ const RoomDetails = () => {
               {room.amenities.map((item, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-100 transition-all duration-300 hover:bg-primary/10 hover:text-primary cursor-default"
                 >
                   <img
                     src={facilityIcons[item]}
@@ -184,7 +184,7 @@ const RoomDetails = () => {
         {/* CheckIn CheckOut Form */}
         <form
           onSubmit={onSubmitHandler}
-          className="flex flex-col md:flex-row items-start md:items-center justify-between bg-white shadow-[0px_0px_20px_rgba(0,0,0,0.15)] p-6 rounded-xl mx-auto mt-16 max-w-6xl"
+          className="flex flex-col md:flex-row items-start md:items-center justify-between bg-white shadow-[0px_0px_20px_rgba(0,0,0,0.15)] p-6 rounded-xl mx-auto mt-16 max-w-6xl animate-slide-in-bottom"
         >
           <div className="flex flex-col flex-wrap md:flex-row items-start md:items-center gap-4 md:gap-10 text-gray-500">
             <div className="flex flex-col">
@@ -199,7 +199,7 @@ const RoomDetails = () => {
                 type="date"
                 id="checkInDate"
                 placeholder="check-In"
-                className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none"
+                className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
                 required
               />
             </div>
@@ -219,7 +219,7 @@ const RoomDetails = () => {
                 type="date"
                 id="checkOutDate"
                 placeholder="check-Out"
-                className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none"
+                className="w-full rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300 disabled:opacity-50"
                 required
               />
             </div>
@@ -236,7 +236,7 @@ const RoomDetails = () => {
                 type="number"
                 id="guests"
                 placeholder="1"
-                className="max-w-20 rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none "
+                className="max-w-20 rounded border border-gray-300 px-3 py-2 mt-1.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
                 required
               />
             </div>
@@ -244,16 +244,16 @@ const RoomDetails = () => {
 
           <button
             type="submit"
-            className="bg-primary hover:bg-primary-dull active:scale-95 transition-all text-white rounded-md max-md:w-full max-md:mt-6 md:px-25 py-3 md:py-4 text-base cursor-pointer"
+            className="bg-primary hover:bg-primary-dull active:scale-95 transition-all duration-300 text-white rounded-md max-md:w-full max-md:mt-6 md:px-25 py-3 md:py-4 text-base cursor-pointer hover:shadow-lg hover:shadow-primary/30 btn-press"
           >
             {isAvailable ? "Book Now" : "Check Availability"}
           </button>
         </form>
 
         {/* Common Specifications */}
-        <div className="mt-25 space-y-4">
+        <div className="mt-25 space-y-4 stagger-children">
           {roomCommonData.map((spec, index) => (
-            <div key={index} className="flex items-start gap-2">
+            <div key={index} className="flex items-start gap-3 p-3 rounded-xl transition-all duration-300 hover:bg-gray-50">
               <img
                 src={spec.icon}
                 alt={`${spec.title}-icon`}
@@ -268,7 +268,7 @@ const RoomDetails = () => {
           ))}
         </div>
 
-        <div className="max-w-3xl border-y border-gray-300 my-15 py-10 text-gray-500">
+        <div className="max-w-3xl border-y border-gray-300 my-15 py-10 text-gray-500 leading-relaxed">
           <p>
             Guests will be allocated on the ground floor according to
             availability. You get a comfortable Two bedroom apartment has a true
@@ -286,7 +286,7 @@ const RoomDetails = () => {
             <img
               src={room.hotel.owner.image}
               alt={room.hotel.name}
-              className="h-14 w-14 md:h-18 rounded-full object-cover"
+              className="h-14 w-14 md:h-18 rounded-full object-cover ring-2 ring-primary/20"
             />
             <div className="flex flex-col gap-2">
               <p className="text-lg md:text-xl">Hosted By {room.hotel.name}</p>
@@ -296,7 +296,7 @@ const RoomDetails = () => {
               </div>
             </div>
           </div>
-          <button className="px-6 py-2.5 mt-4 rounded text-white bg-primary hover:bg-primary-dull transition-all cursor-pointer">
+          <button className="px-6 py-2.5 mt-4 rounded text-white bg-primary hover:bg-primary-dull transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-primary/30 btn-press">
             Contact Now
           </button>
         </div>

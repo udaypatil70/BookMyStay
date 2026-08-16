@@ -7,23 +7,26 @@ const highlights = [
     title: "Flexible Booking",
     description:
       "Adjust plans easily with supportive customer care and transparent policies.",
+    icon: "🔄",
   },
   {
     title: "Curated Luxury",
     description:
       "Every stay is selected for comfort, design, and memorable service.",
+    icon: "✨",
   },
   {
     title: "Local Experiences",
     description:
       "Discover signature activities crafted around the destinations you love.",
+    icon: "🌍",
   },
 ];
 
 const stats = [
-  { value: "4.9/5", label: "Guest satisfaction" },
-  { value: "120+", label: "Luxury destinations" },
-  { value: "98%", label: "Repeat travelers" },
+  { value: "4.9/5", label: "Guest satisfaction", color: "from-blue-500 to-blue-600" },
+  { value: "120+", label: "Luxury destinations", color: "from-purple-500 to-purple-600" },
+  { value: "98%", label: "Repeat travelers", color: "from-pink-500 to-pink-600" },
 ];
 
 const About = () => {
@@ -36,7 +39,7 @@ const About = () => {
         />
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[1fr_0.9fr]">
-          <div className="rounded-[2rem] bg-white p-8 shadow-sm md:p-10">
+          <div className="rounded-[2rem] bg-white p-8 shadow-sm md:p-10 hover-lift">
             <p className="text-sm font-medium uppercase tracking-[0.25em] text-sky-600">
               Why travelers choose us
             </p>
@@ -46,26 +49,26 @@ const About = () => {
             <p className="mt-4 text-base leading-7 text-gray-600">
               BookMyStay brings together premium accommodations, immersive local
               experiences, and effortless booking support in one place. Whether
-              you’re planning a weekend escape or a long retreat, our platform
+              you're planning a weekend escape or a long retreat, our platform
               helps every detail feel polished and personal.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 to="/rooms"
-                className="rounded-full bg-black px-5 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+                className="rounded-full bg-black px-6 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-lg hover:shadow-black/20 btn-press"
               >
                 Explore Rooms
               </Link>
               <Link
                 to="/experiences"
-                className="rounded-full border border-gray-300 bg-white px-5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                className="rounded-full border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-all duration-300 hover:bg-gray-50 hover:border-gray-400 btn-press"
               >
                 View Experiences
               </Link>
             </div>
           </div>
 
-          <div className="rounded-[2rem] bg-gradient-to-br from-slate-900 to-slate-700 p-8 text-white shadow-sm md:p-10">
+          <div className="rounded-[2rem] bg-gradient-to-br from-slate-900 to-slate-700 p-8 text-white shadow-sm md:p-10 hover-lift">
             <p className="text-sm uppercase tracking-[0.25em] text-slate-300">
               Our promise
             </p>
@@ -73,9 +76,12 @@ const About = () => {
               {highlights.map((item) => (
                 <div
                   key={item.title}
-                  className="rounded-2xl border border-white/10 bg-white/10 p-4"
+                  className="rounded-2xl border border-white/10 bg-white/10 p-5 transition-all duration-300 hover:bg-white/15 hover:border-white/20"
                 >
-                  <h3 className="font-playfair text-xl">{item.title}</h3>
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{item.icon}</span>
+                    <h3 className="font-playfair text-xl">{item.title}</h3>
+                  </div>
                   <p className="mt-2 text-sm text-slate-300">
                     {item.description}
                   </p>
@@ -85,13 +91,13 @@ const About = () => {
           </div>
         </div>
 
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
+        <div className="mt-10 grid gap-4 md:grid-cols-3 stagger-children">
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm"
+              className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm hover-lift"
             >
-              <p className="text-3xl font-semibold text-gray-900">
+              <p className={`text-3xl font-semibold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
                 {stat.value}
               </p>
               <p className="mt-2 text-sm text-gray-600">{stat.label}</p>
