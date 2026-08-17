@@ -1,4 +1,4 @@
-import React from "react";
+
 import { Link } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { useAppContext } from "../context/AppContext";
@@ -23,10 +23,10 @@ const HotelCard = ({ room, index }) => {
       to={`/rooms/${room._id}`}
       onClick={() => scrollTo(0, 0)}
       key={room._id}
-      className="group relative max-w-70 w-full rounded-xl overflow-hidden bg-white text-gray-500/90 shadow-[0px_4px_4px_rgba(0,0,0,0.05)] hover-lift card-glow"
+      className="group relative max-w-70 w-full rounded-2xl overflow-hidden bg-white shadow-sm hover-lift card-glow"
     >
       <div className="img-zoom">
-        <img src={room.images[0]} alt={room.hotel.name} className="transition-transform duration-500" />
+        <img src={room.images[0]} alt={room.hotel.name} className="aspect-[4/3] object-cover w-full" />
       </div>
 
       <button
@@ -47,34 +47,25 @@ const HotelCard = ({ room, index }) => {
       </button>
 
       {index === 0 && (
-        <p className="px-3 py-1 absolute top-3 left-3 text-xs bg-white text-gray-800 font-medium rounded-full shadow-md animate-bounce-in">
+        <p className="px-3 py-1 absolute top-3 left-3 text-xs bg-amber-50 text-amber-700 font-medium rounded-full shadow-md">
           Best Seller
         </p>
       )}
+
       <div className="p-4 pt-5">
-        <div className="flex items-center justify-between">
-          <p className="font-playfair text-xl font-medium text-gray-800 group-hover:text-primary transition-colors duration-300">
-            {room.hotel.name}
-          </p>
-          <div className="flex items-center gap-1">
-            <img
-              src={assets.starIconFilled}
-              alt="star-icon"
-              className="w-4 h-4"
-            />
-            <span className="text-sm text-gray-800">4.5</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 text-sm">
-          <img src={assets.locationIcon} alt="location-icon"></img>
+        <p className="font-playfair text-lg text-slate-900">
+          {room.hotel.name}
+        </p>
+        <div className="flex items-center gap-2 text-sm mt-1">
+          <img src={assets.locationIcon} alt="location-icon" />
           <span>{room.hotel.address}</span>
         </div>
         <div className="flex items-center justify-between mt-4">
-          <p>
-            <span className="text-xl text-gray-800">${room.pricePerNight}</span>
-            /night
+          <p className="text-sm text-slate-900">
+            <span className="font-semibold">${room.pricePerNight}</span>
+            <span className="text-slate-500"> /night</span>
           </p>
-          <button className="px-4 py-2 text-sm font-medium border border-gray-300 rounded hover:bg-black hover:text-white hover:border-black transition-all duration-300 cursor-pointer btn-press">
+          <button className="px-4 py-2 text-sm font-medium border border-slate-200 rounded-full hover:bg-slate-900 hover:text-white transition-all duration-300 cursor-pointer btn-press">
             Book Now
           </button>
         </div>

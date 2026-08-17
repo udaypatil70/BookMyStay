@@ -4,26 +4,18 @@ import SearchBar from "./SearchBar";
 const Hero = () => {
   return (
     <div
-      className="relative flex flex-col items-start justify-center px-6 md:px-16 lg:px-24 xl:px-32 pt-28 h-screen bg-cover bg-center bg-no-repeat text-white"
+      className="relative flex flex-col items-start justify-center h-screen bg-cover bg-center bg-no-repeat text-white"
       style={{ backgroundImage: `url(${heroImage})` }}
     >
-      <div className="animate-fade-in-up">
-        <p className="bg-[#49B9FF]/50 px-3.5 py-1 rounded-full inline-block backdrop-blur-sm">
-          The Ultimate Hotel Experience
-        </p>
-      </div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/60" />
 
-      <h1 className="font-playfair mt-4 max-w-2xl text-3xl font-bold leading-tight md:text-6xl md:leading-[70px] md:font-extrabold animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-        Discover Your Perfect Getaway Destination
-      </h1>
-
-      <p className="mt-4 max-w-xl text-sm md:text-base animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-        Unparalleled luxury and comfort await at the world's most exclusive
-        hotels and resorts. Start your journey today.
-      </p>
-
-      <div className="absolute bottom-16 left-0 right-0 flex justify-center px-4 animate-slide-in-bottom" style={{ animationDelay: '0.3s' }}>
-        <SearchBar />
+      <div className="relative z-10 flex flex-col items-center justify-center w-full px-4 -mt-16">
+        <h1 className="font-playfair max-w-2xl text-center text-3xl font-bold leading-tight md:text-6xl md:leading-[70px] md:font-extrabold animate-fade-in-up mb-8">
+          Discover Your Perfect Getaway Destination
+        </h1>
+        <div className="w-full max-w-5xl animate-fade-in-up [animation-delay:0.15s]">
+          <SearchBar />
+        </div>
       </div>
     </div>
   );

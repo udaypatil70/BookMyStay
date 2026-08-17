@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
 
@@ -15,7 +14,6 @@ const ListRoom = () => {
   const [editImages, setEditImages] = useState({});
   const [editLoading, setEditLoading] = useState(false);
   const { axios, getToken, user, currency } = useAppContext();
-  const navigate = useNavigate();
 
   const fetchRooms = async () => {
     try {
@@ -68,7 +66,7 @@ const ListRoom = () => {
       "Pool Access": false,
     };
     room.amenities.forEach((a) => {
-      if (amenityMap.hasOwnProperty(a)) amenityMap[a] = true;
+      if (Object.prototype.hasOwnProperty.call(amenityMap, a)) amenityMap[a] = true;
     });
     setEditForm({
       roomType: room.roomType,

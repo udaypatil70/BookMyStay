@@ -1,4 +1,3 @@
-import React from "react";
 import { assets, roomsDummyData } from "../assets/assets";
 import Title from "../components/Title";
 
@@ -51,7 +50,7 @@ const Experiences = () => {
         />
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="overflow-hidden rounded-3xl bg-white shadow-sm hover-lift">
+          <div className="rounded-2xl bg-white shadow-sm overflow-hidden">
             <div className="img-zoom">
               <img
                 src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1400&q=80"
@@ -70,7 +69,7 @@ const Experiences = () => {
                 From private beach dinners to guided excursions, every detail is
                 designed to turn your travel into a story worth remembering.
               </p>
-              <button className="mt-6 rounded-full border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-all duration-300 hover:bg-gray-50 hover:border-gray-400 btn-press">
+              <button className="mt-6 rounded-full border border-slate-300 bg-white px-6 py-2.5 text-sm font-medium text-slate-700 transition-all duration-300 hover:bg-slate-50 hover:border-slate-400 btn-press">
                 Book an Experience
               </button>
             </div>
@@ -80,7 +79,7 @@ const Experiences = () => {
             {experiences.map((item) => (
               <div
                 key={item.id}
-                className="flex gap-4 rounded-2xl bg-white p-3 shadow-sm hover-lift cursor-pointer"
+                className="flex gap-4 rounded-xl bg-white p-3 shadow-sm border border-slate-100 cursor-pointer"
               >
                 <img
                   src={item.image}
@@ -103,7 +102,7 @@ const Experiences = () => {
           </div>
         </div>
 
-        <div className="mt-16 rounded-[2rem] bg-white p-8 shadow-sm md:p-10 hover-lift">
+        <div className="mt-16 bg-white rounded-2xl p-8 shadow-sm border border-slate-100">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-sm font-medium uppercase tracking-[0.25em] text-sky-600">
@@ -113,7 +112,7 @@ const Experiences = () => {
                 Pair your experience with an exceptional room
               </h3>
             </div>
-            <button className="rounded-full bg-black px-6 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-lg hover:shadow-black/20 btn-press">
+            <button className="rounded-full bg-slate-900 px-6 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-slate-800 hover:shadow-lg btn-press">
               Explore Rooms
             </button>
           </div>
@@ -122,7 +121,7 @@ const Experiences = () => {
             {roomsDummyData.map((room) => (
               <div
                 key={room._id}
-                className="overflow-hidden rounded-2xl border border-gray-100 bg-slate-50 hover-lift"
+                className="overflow-hidden rounded-xl border border-slate-100"
               >
                 <div className="img-zoom">
                   <img
@@ -152,7 +151,7 @@ const Experiences = () => {
                     {room.amenities.slice(0, 2).map((item) => (
                       <span
                         key={item}
-                        className="rounded-full bg-white px-3 py-1 text-xs text-gray-600"
+                        className="rounded-full bg-slate-50 px-3 py-1 text-xs text-gray-600"
                       >
                         {item}
                       </span>

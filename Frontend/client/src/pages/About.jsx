@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import Title from "../components/Title";
 
@@ -39,7 +38,7 @@ const About = () => {
         />
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[1fr_0.9fr]">
-          <div className="rounded-[2rem] bg-white p-8 shadow-sm md:p-10 hover-lift">
+          <div className="bg-white rounded-2xl p-8 shadow-sm">
             <p className="text-sm font-medium uppercase tracking-[0.25em] text-sky-600">
               Why travelers choose us
             </p>
@@ -55,20 +54,20 @@ const About = () => {
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 to="/rooms"
-                className="rounded-full bg-black px-6 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-lg hover:shadow-black/20 btn-press"
+                className="rounded-full bg-slate-900 px-6 py-2.5 text-sm font-medium text-white transition-all duration-300 hover:bg-slate-800 hover:shadow-lg btn-press"
               >
                 Explore Rooms
               </Link>
               <Link
                 to="/experiences"
-                className="rounded-full border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-all duration-300 hover:bg-gray-50 hover:border-gray-400 btn-press"
+                className="rounded-full border border-slate-300 bg-white px-6 py-2.5 text-sm font-medium text-slate-700 transition-all duration-300 hover:bg-slate-50 hover:border-slate-400 btn-press"
               >
                 View Experiences
               </Link>
             </div>
           </div>
 
-          <div className="rounded-[2rem] bg-gradient-to-br from-slate-900 to-slate-700 p-8 text-white shadow-sm md:p-10 hover-lift">
+          <div className="bg-slate-900 text-white rounded-2xl p-8">
             <p className="text-sm uppercase tracking-[0.25em] text-slate-300">
               Our promise
             </p>
@@ -76,7 +75,7 @@ const About = () => {
               {highlights.map((item) => (
                 <div
                   key={item.title}
-                  className="rounded-2xl border border-white/10 bg-white/10 p-5 transition-all duration-300 hover:bg-white/15 hover:border-white/20"
+                  className="rounded-xl bg-white/10 border-white/10 p-5"
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{item.icon}</span>
@@ -95,7 +94,7 @@ const About = () => {
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm hover-lift"
+              className="rounded-2xl border border-slate-200 bg-white p-6 text-center"
             >
               <p className={`text-3xl font-semibold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
                 {stat.value}

@@ -1,35 +1,36 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { assets } from "../assets/assets";
 
 const Footer = () => {
   return (
-    <div className="bg-[#F6F9FC] text-gray-500/80 pt-8 px-6 md:px-16 lg:px-24 xl:px-32">
-      <div className="flex flex-wrap justify-between gap-12 md:gap-6 opacity-80">
+    <div className="bg-slate-900 text-slate-400 px-6 md:px-16 lg:px-24 xl:px-32 pt-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
         <div className="max-w-80">
-          <span className="mb-4 text-2xl font-playfair font-bold tracking-tight text-gray-900 inline-block">
-            BookMy<span className="text-primary">Stay</span>
+          <span className="font-playfair text-2xl font-bold tracking-tight text-white inline-block">
+            BookMy<span className="text-secondary">Stay</span>
           </span>
-          <p className="text-sm leading-relaxed">
+          <p className="mt-4 text-sm leading-relaxed">
             Discover the world's most extraordinary places to stay, from
             boutique hotels to luxury villas and private islands.
           </p>
-          <div className="flex items-center gap-3 mt-4">
+          <div className="flex items-center gap-3 mt-5">
             {[assets.instagramIcon, assets.facebookIcon, assets.twitterIcon, assets.linkendinIcon].map((icon, i) => (
               <img
                 key={i}
                 src={icon}
                 alt="social-icon"
-                className="w-6 cursor-pointer transition-all duration-300 hover:scale-125 hover:opacity-80"
+                className="w-5 opacity-60 cursor-pointer transition-all duration-300 hover:scale-110 hover:opacity-100"
               />
             ))}
           </div>
         </div>
 
         <div>
-          <p className="font-playfair text-lg text-gray-800">COMPANY</p>
-          <ul className="mt-3 flex flex-col gap-2.5 text-sm">
-            <li><Link to="/about" className="transition-colors duration-300 hover:text-gray-800 hover:underline">About</Link></li>
+          <p className="font-playfair text-lg font-semibold text-slate-200">COMPANY</p>
+          <ul className="mt-4 flex flex-col gap-3 text-sm">
+            <li>
+              <Link to="/about" className="transition-colors duration-300 hover:text-white">About</Link>
+            </li>
             <li><span className="cursor-default">Careers</span></li>
             <li><span className="cursor-default">Press</span></li>
             <li><span className="cursor-default">Blog</span></li>
@@ -38,28 +39,30 @@ const Footer = () => {
         </div>
 
         <div>
-          <p className="font-playfair text-lg text-gray-800">SUPPORT</p>
-          <ul className="mt-3 flex flex-col gap-2.5 text-sm">
+          <p className="font-playfair text-lg font-semibold text-slate-200">SUPPORT</p>
+          <ul className="mt-4 flex flex-col gap-3 text-sm">
             <li><span className="cursor-default">Help Center</span></li>
             <li><span className="cursor-default">Safety Information</span></li>
             <li><span className="cursor-default">Cancellation Options</span></li>
-            <li><Link to="/contact" className="transition-colors duration-300 hover:text-gray-800 hover:underline">Contact Us</Link></li>
+            <li>
+              <Link to="/contact" className="transition-colors duration-300 hover:text-white">Contact Us</Link>
+            </li>
             <li><span className="cursor-default">Accessibility</span></li>
           </ul>
         </div>
 
         <div className="max-w-80">
-          <p className="font-playfair text-lg text-gray-800">STAY UPDATED</p>
-          <p className="mt-3 text-sm leading-relaxed">
+          <p className="font-playfair text-lg font-semibold text-slate-200">STAY UPDATED</p>
+          <p className="mt-4 text-sm leading-relaxed">
             Subscribe to our newsletter for inspiration and special offers.
           </p>
-          <div className="flex items-center mt-4">
+          <div className="flex items-center mt-5">
             <input
-              type="text"
-              className="bg-white rounded-l border border-gray-300 h-10 px-3 outline-none text-sm transition-all duration-300 focus:border-primary focus:ring-2 focus:ring-primary/20 w-full"
+              type="email"
+              className="bg-slate-800 border border-slate-700 rounded-l-lg h-11 px-4 outline-none text-sm text-white placeholder:text-slate-500 transition-all duration-300 focus:border-secondary focus:ring-1 focus:ring-secondary/30 w-full"
               placeholder="Your email"
             />
-            <button className="flex items-center justify-center bg-black h-10 w-10 aspect-square rounded-r transition-all duration-300 hover:bg-gray-800 btn-press">
+            <button className="flex items-center justify-center bg-secondary h-11 w-11 rounded-r-lg transition-all duration-300 hover:bg-amber-600 btn-press shrink-0">
               <img
                 src={assets.arrowIcon}
                 alt="arrow-icon"
@@ -69,13 +72,17 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <hr className="border-gray-300 mt-8" />
-      <div className="flex flex-col md:flex-row gap-2 items-center justify-between py-5">
-        <p>© {new Date().getFullYear()} BookMyStay. All rights reserved.</p>
-        <ul className="flex items-center gap-6">
+
+      <hr className="border-slate-800 mt-12" />
+
+      <div className="flex flex-col md:flex-row items-center justify-between py-6">
+        <p className="text-sm">
+          © {new Date().getFullYear()} BookMyStay. All rights reserved.
+        </p>
+        <ul className="flex items-center gap-6 mt-3 md:mt-0">
           {["Privacy", "Terms", "Sitemap"].map((item) => (
             <li key={item}>
-              <span className="text-sm cursor-default transition-colors duration-300">{item}</span>
+              <span className="text-sm cursor-default transition-colors duration-300 hover:text-white">{item}</span>
             </li>
           ))}
         </ul>

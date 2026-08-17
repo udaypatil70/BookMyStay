@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Title from "../components/Title";
 import { useAppContext } from "../context/AppContext";
@@ -90,10 +90,6 @@ const Contact = () => {
     }
   };
 
-  const inputClass =
-    "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition-all duration-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 placeholder:text-gray-400";
-  const labelClass = "block text-sm font-medium text-gray-700 mb-1.5";
-
   return (
     <div className="bg-slate-50 pt-24 pb-20">
       <div className="px-6 md:px-16 lg:px-24 xl:px-32">
@@ -103,9 +99,8 @@ const Contact = () => {
         />
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          {/* Left: Info + Map */}
           <div className="space-y-6">
-            <div className="rounded-[2rem] bg-white p-8 shadow-sm md:p-10 hover-lift">
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
               <p className="text-sm font-medium uppercase tracking-[0.25em] text-sky-600">
                 Get in touch
               </p>
@@ -122,7 +117,7 @@ const Contact = () => {
                 {contactInfo.map((item) => (
                   <div
                     key={item.title}
-                    className="rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all duration-300 hover:bg-slate-100 hover:border-slate-300"
+                    className="rounded-xl bg-slate-50 p-4 border border-slate-100"
                   >
                     <div className="flex items-center gap-3">
                       {item.icon}
@@ -141,8 +136,7 @@ const Contact = () => {
               </div>
             </div>
 
-            {/* Quick browse */}
-            <div className="rounded-[2rem] bg-white p-8 shadow-sm hover-lift">
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
               <p className="text-sm font-medium text-gray-500">
                 Prefer browsing first?
               </p>
@@ -159,8 +153,7 @@ const Contact = () => {
             </div>
           </div>
 
-          {/* Right: Form */}
-          <div className="rounded-[2rem] bg-gradient-to-br from-slate-900 to-slate-700 p-8 text-white shadow-sm md:p-10 hover-lift">
+          <div className="bg-slate-900 text-white rounded-2xl p-8">
             <p className="text-sm uppercase tracking-[0.25em] text-slate-300">
               Send us a message
             </p>
@@ -172,7 +165,6 @@ const Contact = () => {
             </p>
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-              {/* Name */}
               <div>
                 <label className="text-xs font-medium text-slate-300 mb-1 block">
                   Full Name <span className="text-red-400">*</span>
@@ -188,7 +180,6 @@ const Contact = () => {
                 />
               </div>
 
-              {/* Email */}
               <div>
                 <label className="text-xs font-medium text-slate-300 mb-1 block">
                   Email Address <span className="text-red-400">*</span>
@@ -204,7 +195,6 @@ const Contact = () => {
                 />
               </div>
 
-              {/* Phone */}
               <div>
                 <label className="text-xs font-medium text-slate-300 mb-1 block">
                   Phone Number
@@ -219,7 +209,6 @@ const Contact = () => {
                 />
               </div>
 
-              {/* Dates row */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-medium text-slate-300 mb-1 block">
@@ -250,7 +239,6 @@ const Contact = () => {
                 </div>
               </div>
 
-              {/* Guests */}
               <div>
                 <label className="text-xs font-medium text-slate-300 mb-1 block">
                   Number of Guests
@@ -269,7 +257,6 @@ const Contact = () => {
                 </select>
               </div>
 
-              {/* Message */}
               <div>
                 <label className="text-xs font-medium text-slate-300 mb-1 block">
                   Message <span className="text-red-400">*</span>
@@ -285,7 +272,6 @@ const Contact = () => {
                 />
               </div>
 
-              {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}

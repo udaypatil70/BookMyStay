@@ -1,4 +1,4 @@
-import React from "react";
+
 import { useNavigate } from "react-router-dom";
 import Title from "./Title";
 import { assets, exclusiveOffers } from "../assets/assets";
@@ -7,8 +7,8 @@ const ExclusiveOffers = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center px-6 md:px-16 lg:px-24 xl:px-32 pt-20 pb-30">
-      <div className="flex flex-col md:flex-row items-center justify-between w-full">
+    <div className="py-24 px-6 md:px-16 lg:px-24">
+      <div className="flex justify-between items-end">
         <Title
           align="left"
           title="Exclusive Offers"
@@ -16,7 +16,7 @@ const ExclusiveOffers = () => {
         />
         <button
           onClick={() => { navigate("/rooms"); scrollTo(0, 0); }}
-          className="group flex items-center gap-2 font-medium cursor-pointer whitespace-nowrap"
+          className="group hidden md:flex items-center gap-2 font-medium cursor-pointer whitespace-nowrap text-slate-900"
         >
           <span>View All Offers</span>
           <img
@@ -27,35 +27,37 @@ const ExclusiveOffers = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12 w-full stagger-children">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
         {exclusiveOffers.map((item) => (
           <div
             key={item._id}
-            className="group relative flex flex-col items-start justify-between gap-1 pt-12 md:pt-18 px-4 rounded-xl text-white bg-no-repeat bg-cover bg-center overflow-hidden hover-lift"
+            className="group relative rounded-2xl overflow-hidden relative h-72 text-white bg-no-repeat bg-cover bg-center hover-lift"
             style={{ backgroundImage: `url(${item.image})` }}
           >
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 rounded-xl" />
-            <p className="px-3 py-1 absolute top-4 left-4 text-xs bg-white text-gray-800 font-medium rounded-full shadow-md z-10">
+            <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all duration-500" />
+            <p className="px-3 py-1 absolute top-4 left-4 text-xs bg-white text-slate-900 rounded-full font-semibold z-10">
               {item.priceOff}% OFF
             </p>
-            <div className="relative z-10">
-              <p className="text-2xl font-medium font-playfair">{item.title}</p>
-              <p>{item.description}</p>
-              <p className="text-xs text-white/70 mt-3">
-                Expires {item.expiryDate}
-              </p>
+            <div className="relative z-10 h-full flex flex-col justify-end p-6">
+              <div>
+                <p className="text-2xl font-medium font-playfair">{item.title}</p>
+                <p className="mt-1">{item.description}</p>
+                <p className="text-xs text-white/70 mt-3">
+                  Expires {item.expiryDate}
+                </p>
+              </div>
+              <button
+                onClick={() => { navigate("/rooms"); scrollTo(0, 0); }}
+                className="flex items-center gap-2 font-medium cursor-pointer mt-4 group/btn"
+              >
+                View Offers
+                <img
+                  className="invert group-hover/btn:translate-x-1 transition-all duration-300"
+                  src={assets.arrowIcon}
+                  alt="Arrow-Icon"
+                />
+              </button>
             </div>
-            <button
-              onClick={() => { navigate("/rooms"); scrollTo(0, 0); }}
-              className="relative z-10 flex items-center gap-2 font-medium cursor-pointer mt-4 mb-5 group/btn"
-            >
-              View Offers
-              <img
-                className="invert group-hover/btn:translate-x-1 transition-all duration-300"
-                src={assets.arrowIcon}
-                alt="Arrow-Icon"
-              />
-            </button>
           </div>
         ))}
       </div>

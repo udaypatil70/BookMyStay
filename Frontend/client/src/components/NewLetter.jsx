@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { assets } from "../assets/assets";
-import Title from "./Title";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
 
@@ -33,29 +32,49 @@ const NewLetter = () => {
   };
 
   return (
-    <div className="flex flex-col items-center max-w-5xl lg:w-full rounded-2xl px-6 py-14 md:py-18 mx-2 lg:mx-auto my-30 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white shadow-2xl shadow-black/20 animate-fade-in-up">
-      <Title
-        title="Stay Inspired"
-        subtitle="Join our newsletter and be the first to discover new destinations, exclusive offers, and travel inspiration."
-      />
-      <form onSubmit={handleSubscribe} className="flex flex-col md:flex-row items-center justify-center gap-4 mt-8 w-full max-w-lg">
+    <div className="max-w-4xl mx-auto rounded-3xl px-8 py-16 mx-6 my-24 bg-slate-900 text-white">
+      <h2 className="text-3xl md:text-4xl font-playfair text-white text-center">
+        Stay Inspired
+      </h2>
+      <p className="text-slate-300 text-center mt-3 max-w-xl mx-auto">
+        Join our newsletter and be the first to discover new destinations, exclusive offers, and travel inspiration.
+      </p>
+      <form
+        onSubmit={handleSubscribe}
+        className="flex flex-col md:flex-row gap-3 mt-8 justify-center"
+      >
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="bg-white/10 px-4 py-3 border border-white/20 rounded-lg outline-none w-full md:w-auto md:flex-1 text-white placeholder:text-gray-400 focus:border-white/40 focus:bg-white/15 transition-all duration-300"
+          className="bg-white/10 border border-white/20 rounded-xl px-5 py-3 text-white placeholder:text-slate-400 flex-1 max-w-md focus:bg-white/15 focus:border-white/30 outline-none transition-all duration-300"
           placeholder="Enter your email"
         />
         <button
           type="submit"
           disabled={loading}
-          className="flex items-center justify-center gap-2 group bg-white text-gray-900 px-6 md:px-8 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-gray-100 hover:shadow-lg btn-press w-full md:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
+          className="bg-white text-slate-900 px-8 py-3 rounded-xl font-medium hover:bg-slate-100 transition inline-flex items-center gap-2 btn-press disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {loading ? (
             <>
-              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              <svg
+                className="w-4 h-4 animate-spin"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
               </svg>
               Subscribing...
             </>
@@ -65,13 +84,13 @@ const NewLetter = () => {
               <img
                 src={assets.arrowIcon}
                 alt="arrow-icon"
-                className="w-3.5 group-hover:translate-x-1 transition-all duration-300"
+                className="w-3.5"
               />
             </>
           )}
         </button>
       </form>
-      <p className="text-gray-500 mt-6 text-xs text-center">
+      <p className="text-slate-400 mt-6 text-xs text-center">
         By subscribing, you agree to our Privacy Policy and consent to receive
         updates.
       </p>

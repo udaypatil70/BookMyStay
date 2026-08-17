@@ -5,7 +5,7 @@ import { useAppContext } from "../context/AppContext";
 
 const BookIcon = () => (
   <svg
-    className="w-4 h-4 text-gray-700"
+    className="w-4 h-4"
     aria-hidden="true"
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -35,7 +35,6 @@ const Navbar = () => {
 
   const { openSignIn } = useClerk();
   const location = useLocation();
-
   const { user, navigate, isOwner, setShowHotelReg } = useAppContext();
 
   useEffect(() => {
@@ -60,7 +59,6 @@ const Navbar = () => {
     };
 
     handleScroll();
-
     window.addEventListener("scroll", handleScroll);
 
     return () => {
@@ -70,157 +68,199 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 md:px-16 lg:px-24 xl:px-32 transition-all duration-500 ${
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
         isScrolled
-          ? "bg-white/80 backdrop-blur-lg shadow-md text-gray-700 py-3 md:py-4"
-          : "bg-transparent py-4 md:py-6"
+          ? "glass shadow-[0_1px_20px_rgba(0,0,0,0.06)] py-3"
+          : "bg-transparent py-5"
       }`}
     >
-      {/* Logo */}
-      <Link to="/">
-        <span className={`text-2xl font-playfair font-bold tracking-tight ${
-          isScrolled ? "text-gray-900" : "text-white"
-        } transition-colors duration-300`}>
-          BookMy<span className="text-primary">Stay</span>
-        </span>
-      </Link>
+      <div className="max-w-7xl mx-auto px-6 lg:px-10">
+        <div className="flex items-center justify-between h-14 md:h-16">
+          <div className="flex-1">
+            <Link to="/" className="inline-flex items-center">
+              <span
+                className={`text-2xl font-playfair font-bold tracking-tight transition-colors duration-300 ${
+                  isScrolled ? "text-primary" : "text-white"
+                }`}
+              >
+                BookMy<span className="text-secondary">Stay</span>
+              </span>
+            </Link>
+          </div>
 
-      {/* Desktop Navigation */}
-      <div className="hidden md:flex items-center gap-4 lg:gap-8">
-        {navLinks.map((link) => {
-          const isActive = location.pathname === link.path;
-          return (
-            <Link
-              key={link.name}
-              to={link.path}
-              className={`group flex flex-col gap-1 ${
-                isScrolled ? "text-gray-700" : "text-white"
+          <div className="hidden md:flex items-center gap-10">
+            {navLinks.map((link) => {
+              const isActive = location.pathname === link.path;
+              return (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className={`relative text-sm tracking-wide font-medium transition-colors duration-300 ${
+                    isScrolled
+                      ? isActive
+                        ? "text-primary"
+                        : "text-gray-500 hover:text-primary"
+                      : isActive
+                        ? "text-white"
+                        : "text-white/70 hover:text-white"
+                  }`}
+                >
+                  {link.name}
+                  <span
+                    className={`absolute -bottom-1 left-0 h-[1.5px] rounded-full transition-all duration-300 ${
+                      isActive ? "w-full" : "w-0"
+                    } ${isScrolled ? "bg-secondary" : "bg-white"}`}
+                  />
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="flex-1 hidden md:flex items-center justify-end gap-5">
+            {user && (
+              <button
+                className={`text-sm font-medium px-5 py-2 rounded-full border transition-all duration-300 btn-press ${
+                  isScrolled
+                    ? "border-gray-200 text-primary hover:border-primary hover:bg-primary hover:text-white"
+                    : "border-white/30 text-white hover:border-white hover:bg-white hover:text-primary"
+                }`}
+                onClick={() =>
+                  isOwner ? navigate("/owner") : setShowHotelReg(true)
+                }
+              >
+                {isOwner ? "Dashboard" : "List Your Hotel"}
+              </button>
+            )}
+            {user ? (
+              <UserButton>
+                <UserButton.MenuItems>
+                  <UserButton.Action
+                    label="My Bookings"
+                    labelIcon={<BookIcon />}
+                    onClick={() => navigate("/my-bookings")}
+                  />
+                </UserButton.MenuItems>
+              </UserButton>
+            ) : (
+              <button
+                onClick={() => openSignIn()}
+                className={`text-sm font-medium px-6 py-2.5 rounded-full transition-all duration-300 btn-press ${
+                  isScrolled
+                    ? "bg-primary text-white hover:bg-gray-800"
+                    : "bg-white text-primary hover:bg-white/90"
+                }`}
+              >
+                Login
+              </button>
+            )}
+          </div>
+
+          <div className="md:hidden flex items-center gap-3">
+            {user && (
+              <UserButton>
+                <UserButton.MenuItems>
+                  <UserButton.Action
+                    label="My Bookings"
+                    labelIcon={<BookIcon />}
+                    onClick={() => navigate("/my-bookings")}
+                  />
+                </UserButton.MenuItems>
+              </UserButton>
+            )}
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              className={`p-2 -mr-2 transition-colors duration-300 ${
+                isScrolled ? "text-primary" : "text-white"
               }`}
             >
-              {link.name}
-              <div
-                className={`h-0.5 transition-all duration-300 ${
-                  isActive ? "w-full" : "w-0 group-hover:w-full"
-                } ${isScrolled ? "bg-gray-700" : "bg-white"}`}
-              />
-            </Link>
-          );
-        })}
-
-        {user && (
-          <button
-            className={`border rounded-full px-4 py-1 text-sm ${
-              isScrolled ? "text-black" : "text-white"
-            }`}
-            onClick={() =>
-              isOwner ? navigate("/owner") : setShowHotelReg(true)
-            }
-          >
-            {isOwner ? "Dashboard" : "List Your Hotel"}
-          </button>
-        )}
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Right Side */}
-      <div className="hidden md:flex items-center gap-4">
-        {user ? (
-          <UserButton>
-            <UserButton.MenuItems>
-              <UserButton.Action
-                label="My Bookings"
-                labelIcon={<BookIcon />}
-                onClick={() => navigate("/my-bookings")}
-              />
-            </UserButton.MenuItems>
-          </UserButton>
-        ) : (
-          <button
-            onClick={() => openSignIn()}
-            className={`ml-4 rounded-full px-8 py-2.5 ${
-              isScrolled ? "bg-black text-white" : "bg-white text-black"
-            }`}
-          >
-            Login
-          </button>
-        )}
-      </div>
+      {isMenuOpen && (
+        <div className="fixed inset-0 z-50 md:hidden animate-fade-in-down">
+          <div className="absolute inset-0 bg-white" />
 
-      {/* Mobile */}
-      <div className="md:hidden flex items-center gap-4">
-        {user && (
-          <UserButton>
-            <UserButton.MenuItems>
-              <UserButton.Action
-                label="My Bookings"
-                labelIcon={<BookIcon />}
-                onClick={() => navigate("/my-bookings")}
-              />
-            </UserButton.MenuItems>
-          </UserButton>
-        )}
-
-        <img
-          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 6h16M4 12h16M4 18h16'/%3E%3C/svg%3E"
-          alt="Menu"
-          className={`h-5 cursor-pointer ${isScrolled ? "invert" : ""}`}
-          onClick={() => setIsMenuOpen(true)}
-        />
-      </div>
-
-      {/* Mobile Menu */}
-      <div
-        className={`fixed top-0 left-0 h-screen w-full bg-white flex flex-col items-center justify-center gap-8 transition-transform duration-500 ease-out ${
-          isMenuOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        <button
-          className="absolute top-5 right-5 transition-transform duration-300 hover:rotate-90"
-          onClick={() => setIsMenuOpen(false)}
-        >
-          <svg className="h-6 w-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-
-        {navLinks.map((link, index) => {
-          const isActive = location.pathname === link.path;
-          return (
-            <Link
-              key={link.name}
-              to={link.path}
+          <div className="relative flex flex-col items-center justify-center h-full">
+            <button
+              className="absolute top-6 right-6 p-2 text-gray-400 hover:text-primary transition-all duration-300 hover:rotate-90"
               onClick={() => setIsMenuOpen(false)}
-              className={`text-xl font-medium transition-colors duration-300 ${
-                isActive ? "text-primary" : "text-gray-800 hover:text-primary"
-              }`}
-              style={{
-                animationDelay: isMenuOpen ? `${index * 0.1}s` : '0s'
-              }}
             >
-              {link.name}
-            </Link>
-          );
-        })}
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
 
-        {user && (
-          <button
-            className="border rounded-full px-6 py-2 text-sm font-medium cursor-pointer transition-all duration-300 hover:bg-black hover:text-white btn-press"
-            onClick={() => {
-              isOwner ? navigate("/owner") : setShowHotelReg(true);
-            }}
-          >
-            {isOwner ? "Dashboard" : "List Your Hotel"}
-          </button>
-        )}
+            <div className="stagger-children flex flex-col items-center gap-8">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.name}
+                    to={link.path}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`text-3xl font-playfair font-semibold tracking-wide transition-colors duration-300 ${
+                      isActive
+                        ? "text-primary"
+                        : "text-gray-800 hover:text-primary"
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                );
+              })}
 
-        {!user && (
-          <button
-            onClick={() => openSignIn()}
-            className="rounded-full bg-black px-8 py-2.5 text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-lg btn-press"
-          >
-            Login
-          </button>
-        )}
-      </div>
+              {user && (
+                <button
+                  className="mt-6 border border-primary text-primary px-8 py-3 rounded-full text-sm font-medium hover:bg-primary hover:text-white transition-all duration-300 btn-press"
+                  onClick={() => {
+                    isOwner ? navigate("/owner") : setShowHotelReg(true);
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  {isOwner ? "Dashboard" : "List Your Hotel"}
+                </button>
+              )}
+
+              {!user && (
+                <button
+                  onClick={() => {
+                    openSignIn();
+                    setIsMenuOpen(false);
+                  }}
+                  className="mt-6 bg-primary text-white px-10 py-3 rounded-full text-sm font-medium hover:bg-gray-800 transition-all duration-300 btn-press"
+                >
+                  Login
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

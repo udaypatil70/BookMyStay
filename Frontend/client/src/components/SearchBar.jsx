@@ -2,6 +2,203 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { cities } from "../assets/assets";
 
+const LOCATIONS = [
+  {
+    country: "India",
+    countryIcon: "🇮🇳",
+    states: [
+      {
+        state: "Maharashtra",
+        districts: ["Mumbai", "Pune", "Nagpur", "Thane", "Navi Mumbai", "Nashik", "Aurangabad", "Kolhapur", "Lonavala", "Alibaug"],
+      },
+      {
+        state: "Delhi",
+        districts: ["New Delhi", "Connaught Place", "Dwarka", "Karol Bagh", "Chanakyapuri", "Rohini", "Saket", "Lajpat Nagar"],
+      },
+      {
+        state: "Karnataka",
+        districts: ["Bengaluru", "Mysuru", "Mangaluru", "Hubli", "Coorg", "Hampi", "Gokarna", "Udupi"],
+      },
+      {
+        state: "Tamil Nadu",
+        districts: ["Chennai", "Coimbatore", "Madurai", "Ooty", "Kodaikanal", "Tiruchirappalli", "Hosur", "Mahabalipuram"],
+      },
+      {
+        state: "Rajasthan",
+        districts: ["Jaipur", "Udaipur", "Jodhpur", "Jaisalmer", "Pushkar", "Ajmer", "Bikaner", "Mount Abu"],
+      },
+      {
+        state: "Uttar Pradesh",
+        districts: ["Lucknow", "Agra", "Varanasi", "Noida", "Greater Noida", "Allahabad", "Mathura", "Ghaziabad"],
+      },
+      {
+        state: "West Bengal",
+        districts: ["Kolkata", "Darjeeling", "Siliguri", "Digha", "Santiniketan", "Asansol", "Shantiniketan"],
+      },
+      {
+        state: "Kerala",
+        districts: ["Kochi", "Trivandrum", "Alleppey", "Munnar", "Kovalam", "Wayanad", "Kozhikode", "Thekkady"],
+      },
+      {
+        state: "Goa",
+        districts: ["North Goa", "South Goa", "Panaji", "Calangute", "Anjuna", "Colva", "Arambol", "Morjim"],
+      },
+      {
+        state: "Gujarat",
+        districts: ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Gandhinagar", "Jamnagar", "Kutch", "Dwarka"],
+      },
+      {
+        state: "Madhya Pradesh",
+        districts: ["Bhopal", "Indore", "Jabalpur", "Gwalior", "Ujjain", "Khajuraho", "Orchha", "Sanchi"],
+      },
+      {
+        state: "Punjab",
+        districts: ["Amritsar", "Chandigarh", "Ludhiana", "Patiala", "Jalandhar", "Kapurthala", "Hoshiarpur"],
+      },
+      {
+        state: "Haryana",
+        districts: ["Gurugram", "Faridabad", "Panipat", "Karnal", "Hisar", "Sonipat", "Kurukshetra"],
+      },
+      {
+        state: "Odisha",
+        districts: ["Bhubaneswar", "Puri", "Konark", "Cuttack", "Rourkela", "Sambalpur", "Chilika"],
+      },
+      {
+        state: "Assam",
+        districts: ["Guwahati", "Silchar", "Dibrugarh", "Jorhat", "Tezpur", "Kaziranga"],
+      },
+      {
+        state: "Jammu & Kashmir",
+        districts: ["Srinagar", "Gulmarg", "Pahalgam", "Sonmarg", "Leh", "Jammu", "Patnitop", "Vaishno Devi"],
+      },
+      {
+        state: "Uttarakhand",
+        districts: ["Dehradun", "Mussoorie", "Nainital", "Rishikesh", "Haridwar", "Jim Corbett", "Auli", "Lansdowne"],
+      },
+      {
+        state: "Himachal Pradesh",
+        districts: ["Shimla", "Manali", "Dharamshala", "Kasol", "Dalhousie", "Kullu", "Spiti", "Bir Billing"],
+      },
+      {
+        state: "Sikkim",
+        districts: ["Gangtok", "Pelling", "Lachung", "Namchi", "Ravangla", "Zuluk"],
+      },
+      {
+        state: "Andhra Pradesh",
+        districts: ["Visakhapatnam", "Vijayawada", "Tirupati", "Amaravati", "Araku Valley", "Lepakshi"],
+      },
+      {
+        state: "Telangana",
+        districts: ["Hyderabad", "Warangal", "Nizamabad", "Karimnagar", "Ramoji Film City", "Hussain Sagar"],
+      },
+      {
+        state: "Bihar",
+        districts: ["Patna", "Gaya", "Bodh Gaya", "Nalanda", "Rajgir", "Vaishali"],
+      },
+      {
+        state: "Chhattisgarh",
+        districts: ["Raipur", "Bilaspur", "Jagdalpur", "Chitrakote Falls", "Sirpur"],
+      },
+      {
+        state: "Jharkhand",
+        districts: ["Ranchi", "Jamshedpur", "Dhanbad", "Netarhat", "Hundru Falls"],
+      },
+      {
+        state: "Chandigarh",
+        districts: ["Chandigarh", "Mohali", "Panchkula"],
+      },
+      {
+        state: "Puducherry",
+        districts: ["Pondicherry", "Karaikal", "Mahe", "Yanam"],
+      },
+      {
+        state: "Ladakh",
+        districts: ["Leh", "Nubra Valley", "Pangong Lake", "Zanskar", "Kargil"],
+      },
+      {
+        state: "Meghalaya",
+        districts: ["Shillong", "Cherrapunji", "Mawlynnong", "Dawki", "Tura"],
+      },
+      {
+        state: "Manipur",
+        districts: ["Imphal", "Loktak Lake", "Ukhrul", "Churachandpur"],
+      },
+      {
+        state: "Mizoram",
+        districts: ["Aizawl", "Champhai", "Reiek", "Thenzawl"],
+      },
+      {
+        state: "Nagaland",
+        districts: ["Kohima", "Dimapur", "Mokokchung", "Mon"],
+      },
+      {
+        state: "Tripura",
+        districts: ["Agartala", "Udaipur", "Dharmanagar", "Ambassa"],
+      },
+      {
+        state: "Arunachal Pradesh",
+        districts: ["Itanagar", "Tawang", "Ziro", "Bomdila", "Pasighat"],
+      },
+    ],
+  },
+  {
+    country: "United Arab Emirates",
+    countryIcon: "🇦🇪",
+    states: [
+      {
+        state: "Dubai",
+        districts: ["Dubai Marina", "Downtown Dubai", "Palm Jumeirah", "Jumeirah Beach", "Deira", "Bur Dubai", "Business Bay", "JBR"],
+      },
+      {
+        state: "Abu Dhabi",
+        districts: ["Corniche", "Saadiyat Island", "Yas Island", "Al Maryah Island"],
+      },
+    ],
+  },
+  {
+    country: "Singapore",
+    countryIcon: "🇸🇬",
+    states: [
+      {
+        state: "Central Region",
+        districts: ["Marina Bay", "Orchard", "Sentosa", "Clarke Quay", "Chinatown", "Bugis"],
+      },
+      {
+        state: "East Region",
+        districts: ["Changi", "Tampines", "Pasir Ris"],
+      },
+    ],
+  },
+  {
+    country: "United States",
+    countryIcon: "🇺🇸",
+    states: [
+      {
+        state: "New York",
+        districts: ["Manhattan", "Brooklyn", "Queens", "Times Square", "SoHo", "Midtown"],
+      },
+      {
+        state: "California",
+        districts: ["Los Angeles", "San Francisco", "San Diego", "Malibu"],
+      },
+    ],
+  },
+  {
+    country: "United Kingdom",
+    countryIcon: "🇬🇧",
+    states: [
+      {
+        state: "England",
+        districts: ["London - Westminster", "London - Camden", "London - Kensington", "London - Shoreditch", "Manchester", "Birmingham"],
+      },
+      {
+        state: "Scotland",
+        districts: ["Edinburgh", "Glasgow"],
+      },
+    ],
+  },
+];
+
 const DESTINATIONS = [
   { name: "Nearby", subtitle: "Find what's around you", icon: "📍" },
   ...cities.map((city) => ({
@@ -116,49 +313,245 @@ const CalendarMonth = ({ year, month, startDate, endDate, onDateClick, hoverDate
 // ─── Where Dropdown ───────────────────────────────────────────────────────────
 const WhereDropdown = ({ value, onSelect, onClose }) => {
   const [query, setQuery] = useState(value || "");
+  const [step, setStep] = useState("countries"); // countries | states | districts
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedState, setSelectedState] = useState(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
     inputRef.current?.focus();
-  }, []);
+  }, [step]);
 
-  const filtered = DESTINATIONS.filter((d) =>
-    d.name.toLowerCase().includes(query.toLowerCase())
+  const filteredCountries = LOCATIONS.filter((c) =>
+    c.country.toLowerCase().includes(query.toLowerCase())
   );
 
+  const filteredStates = selectedCountry
+    ? selectedCountry.states.filter((s) =>
+        s.state.toLowerCase().includes(query.toLowerCase())
+      )
+    : [];
+
+  const filteredDistricts =
+    selectedCountry && selectedState
+      ? selectedState.districts.filter((d) =>
+          d.toLowerCase().includes(query.toLowerCase())
+        )
+      : [];
+
+  const handleCountrySelect = (country) => {
+    setSelectedCountry(country);
+    setSelectedState(null);
+    setQuery("");
+    setStep("states");
+  };
+
+  const handleStateSelect = (state) => {
+    setSelectedState(state);
+    setQuery("");
+    setStep("districts");
+  };
+
+  const handleDistrictSelect = (district) => {
+    onSelect(`${district}, ${selectedState.state}`);
+    onClose();
+  };
+
+  const handleBack = () => {
+    if (step === "districts") {
+      setSelectedState(null);
+      setQuery("");
+      setStep("states");
+    } else if (step === "states") {
+      setSelectedCountry(null);
+      setQuery("");
+      setStep("countries");
+    }
+  };
+
+  const breadcrumbs = [];
+  if (selectedCountry) breadcrumbs.push({ label: selectedCountry.country, icon: selectedCountry.countryIcon });
+  if (selectedState) breadcrumbs.push({ label: selectedState.state });
+
   return (
-    <div className="w-full min-w-[320px] max-w-[400px]">
+    <div className="w-full min-w-[380px] max-w-[420px]">
+      {/* Search Input */}
       <div className="p-4 border-b border-gray-200">
-        <input
-          ref={inputRef}
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search destinations"
-          className="w-full text-sm outline-none placeholder:text-gray-400"
-        />
+        <div className="relative">
+          <svg className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={
+              step === "countries"
+                ? "Search countries..."
+                : step === "states"
+                ? "Search states..."
+                : "Search districts..."
+            }
+            className="w-full text-sm outline-none pl-6 placeholder:text-gray-400"
+          />
+        </div>
       </div>
-      <div className="p-2 max-h-[300px] overflow-y-auto">
-        <p className="text-xs font-semibold text-gray-500 px-3 py-2">Suggested destinations</p>
-        {filtered.map((dest) => (
+
+      {/* Breadcrumbs */}
+      {breadcrumbs.length > 0 && (
+        <div className="flex items-center gap-1.5 px-4 pt-3 pb-1 text-xs text-gray-500">
           <button
-            key={dest.name}
-            onClick={() => { onSelect(dest.name); onClose(); }}
-            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-100 transition-colors duration-150 text-left"
+            onClick={() => { setSelectedCountry(null); setSelectedState(null); setQuery(""); setStep("countries"); }}
+            className="hover:text-gray-900 transition-colors"
           >
-            <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-xl shrink-0">
-              {dest.icon}
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-gray-900">{dest.name}</p>
-              <p className="text-xs text-gray-500">{dest.subtitle}</p>
-            </div>
+            All
           </button>
-        ))}
-        {filtered.length === 0 && (
-          <p className="text-sm text-gray-400 text-center py-6">No destinations found</p>
+          {breadcrumbs.map((b, i) => (
+            <span key={i} className="flex items-center gap-1.5">
+              <span>/</span>
+              <button
+                onClick={() => {
+                  if (i === 0) { setSelectedState(null); setQuery(""); setStep("states"); }
+                }}
+                className={`flex items-center gap-1 ${i === breadcrumbs.length - 1 ? "text-gray-900 font-semibold" : "hover:text-gray-900 transition-colors"}`}
+              >
+                {b.icon && <span>{b.icon}</span>}
+                {b.label}
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Back button */}
+      {step !== "countries" && (
+        <button
+          onClick={handleBack}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back
+        </button>
+      )}
+
+      {/* List */}
+      <div className="p-2 max-h-[320px] overflow-y-auto">
+        {/* Countries */}
+        {step === "countries" && (
+          <>
+            <p className="text-xs font-semibold text-gray-400 px-3 py-2 uppercase tracking-wider">Countries</p>
+            {filteredCountries.map((country) => (
+              <button
+                key={country.country}
+                onClick={() => handleCountrySelect(country)}
+                className="w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-100 transition-colors duration-150 text-left group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-xl shrink-0">
+                    {country.countryIcon}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{country.country}</p>
+                    <p className="text-xs text-gray-500">{country.states.length} region{country.states.length > 1 ? "s" : ""}</p>
+                  </div>
+                </div>
+                <svg className="w-4 h-4 text-gray-400 group-hover:text-gray-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            ))}
+            {filteredCountries.length === 0 && (
+              <p className="text-sm text-gray-400 text-center py-6">No countries found</p>
+            )}
+          </>
+        )}
+
+        {/* States */}
+        {step === "states" && selectedCountry && (
+          <>
+            <p className="text-xs font-semibold text-gray-400 px-3 py-2 uppercase tracking-wider">States & Regions</p>
+            {filteredStates.map((state) => (
+              <button
+                key={state.state}
+                onClick={() => handleStateSelect(state)}
+                className="w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-100 transition-colors duration-150 text-left group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center shrink-0">
+                    <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{state.state}</p>
+                    <p className="text-xs text-gray-500">{state.districts.length} district{state.districts.length > 1 ? "s" : ""}</p>
+                  </div>
+                </div>
+                <svg className="w-4 h-4 text-gray-400 group-hover:text-gray-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            ))}
+            {filteredStates.length === 0 && (
+              <p className="text-sm text-gray-400 text-center py-6">No regions found</p>
+            )}
+          </>
+        )}
+
+        {/* Districts */}
+        {step === "districts" && selectedState && (
+          <>
+            <p className="text-xs font-semibold text-gray-400 px-3 py-2 uppercase tracking-wider">Districts & Cities</p>
+            {filteredDistricts.map((district) => (
+              <button
+                key={district}
+                onClick={() => handleDistrictSelect(district)}
+                className="w-full flex items-center justify-between px-3 py-3 rounded-xl hover:bg-gray-100 transition-colors duration-150 text-left group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center shrink-0">
+                    <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{district}</p>
+                    <p className="text-xs text-gray-500">Hotels available</p>
+                  </div>
+                </div>
+                <svg className="w-4 h-4 text-gray-400 group-hover:text-gray-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </button>
+            ))}
+            {filteredDistricts.length === 0 && (
+              <p className="text-sm text-gray-400 text-center py-6">No districts found</p>
+            )}
+          </>
         )}
       </div>
+
+      {/* Quick Select: Nearby */}
+      {step === "countries" && !query && (
+        <div className="border-t border-gray-200 p-2">
+          <button
+            onClick={() => { onSelect("Nearby"); onClose(); }}
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-gray-100 transition-colors duration-150 text-left"
+          >
+            <div className="w-11 h-11 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-xl shrink-0">
+              📍
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-900">Nearby</p>
+              <p className="text-xs text-gray-500">Find what's around you</p>
+            </div>
+          </button>
+        </div>
+      )}
     </div>
   );
 };
@@ -330,8 +723,6 @@ const GUEST_TYPES = [
 ];
 
 const WhoDropdown = ({ guests, onChange }) => {
-  const total = guests.adults + guests.children;
-
   const update = (key, delta) => {
     const newVal = guests[key] + delta;
     if (newVal < 0) return;
