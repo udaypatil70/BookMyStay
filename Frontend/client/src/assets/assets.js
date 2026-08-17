@@ -87,7 +87,7 @@ export const exclusiveOffers = [
     description: "Enjoy a complimentary night and daily breakfast",
     priceOff: 25,
     expiryDate: "Dec 31",
-    image: exclusiveOfferCardImg1,
+    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800",
   },
   {
     _id: 2,
@@ -95,7 +95,7 @@ export const exclusiveOffers = [
     description: "Special couples package including spa treatment",
     priceOff: 20,
     expiryDate: "Jan 31",
-    image: exclusiveOfferCardImg2,
+    image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800",
   },
   {
     _id: 3,
@@ -104,7 +104,7 @@ export const exclusiveOffers = [
       "Book 60 days in advance and save on your stay at any of our luxury properties worldwide.",
     priceOff: 30,
     expiryDate: "Feb 28",
-    image: exclusiveOfferCardImg3,
+    image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800",
   },
 ];
 
@@ -202,6 +202,64 @@ export const hotelDummyData = {
   __v: 0,
 };
 
+// Extra Hotels Dummy Data (for display variety)
+export const extraHotelsDummyData = [
+  {
+    _id: "67f76393197ac559e4089b73",
+    name: "The Grand Palazzo",
+    address: "Marina Boulevard 45",
+    contact: "+9714123456",
+    owner: userDummyData,
+    city: "Dubai",
+    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800",
+  },
+  {
+    _id: "67f76393197ac559e4089b74",
+    name: "Sakura Garden Resort",
+    address: "Orchard Road 12",
+    contact: "+6591234567",
+    owner: userDummyData,
+    city: "Singapore",
+    image: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800",
+  },
+  {
+    _id: "67f76393197ac559e4089b75",
+    name: "Royal Heritage Inn",
+    address: "Westminster Bridge Road 8",
+    contact: "+442012345678",
+    owner: userDummyData,
+    city: "London",
+    image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800",
+  },
+  {
+    _id: "67f76393197ac559e4089b76",
+    name: "Lotus Grand Resort",
+    address: "MG Road, Connaught Place",
+    contact: "+91112345678",
+    owner: userDummyData,
+    city: "New Delhi",
+    image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800",
+  },
+  {
+    _id: "67f76393197ac559e4089b77",
+    name: "Coastal Breeze Hotel",
+    address: "JBR Walk, Beach Road",
+    contact: "+97150123456",
+    owner: userDummyData,
+    city: "Dubai",
+    image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800",
+  },
+  {
+    _id: "67f76393197ac559e4089b78",
+    name: "Mountain View Lodge",
+    address: "Rishikesh-Haridwar Highway",
+    contact: "+91987654321",
+    owner: userDummyData,
+    city: "Rishikesh",
+    image: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=800",
+  },
+];
+
 // Rooms Dummy Data
 export const roomsDummyData = [
   {
@@ -210,7 +268,12 @@ export const roomsDummyData = [
     roomType: "Double Bed",
     pricePerNight: 399,
     amenities: ["Room Service", "Mountain View", "Pool Access"],
-    images: [roomImg1, roomImg2, roomImg3, roomImg4],
+    images: [
+      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800",
+      "https://images.unsplash.com/photo-1590490360182-c33d955e5bde?w=800",
+      "https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=800",
+      "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800",
+    ],
     isAvailable: true,
     createdAt: "2025-04-10T06:26:04.013Z",
     updatedAt: "2025-04-10T06:26:04.013Z",
@@ -219,10 +282,15 @@ export const roomsDummyData = [
   {
     _id: "67f76452197ac559e4089b8e",
     hotel: hotelDummyData,
-    roomType: "Double Bed",
-    pricePerNight: 299,
-    amenities: ["Room Service", "Mountain View", "Pool Access"],
-    images: [roomImg2, roomImg3, roomImg4, roomImg1],
+    roomType: "Suite",
+    pricePerNight: 599,
+    amenities: ["Room Service", "Mountain View", "Pool Access", "Free Breakfast"],
+    images: [
+      "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800",
+      "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800",
+      "https://images.unsplash.com/photo-1590490360182-c33d955e5bde?w=800",
+      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800",
+    ],
     isAvailable: true,
     createdAt: "2025-04-10T06:25:22.593Z",
     updatedAt: "2025-04-10T06:25:22.593Z",
@@ -231,10 +299,15 @@ export const roomsDummyData = [
   {
     _id: "67f76406197ac559e4089b82",
     hotel: hotelDummyData,
-    roomType: "Double Bed",
+    roomType: "Single Bed",
     pricePerNight: 249,
     amenities: ["Free WiFi", "Free Breakfast", "Room Service"],
-    images: [roomImg3, roomImg4, roomImg1, roomImg2],
+    images: [
+      "https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=800",
+      "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800",
+      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800",
+      "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800",
+    ],
     isAvailable: true,
     createdAt: "2025-04-10T06:24:06.285Z",
     updatedAt: "2025-04-10T06:24:06.285Z",
@@ -243,10 +316,15 @@ export const roomsDummyData = [
   {
     _id: "67f763d8197ac559e4089b7a",
     hotel: hotelDummyData,
-    roomType: "Single Bed",
-    pricePerNight: 199,
+    roomType: "Deluxe Room",
+    pricePerNight: 449,
     amenities: ["Free WiFi", "Room Service", "Pool Access"],
-    images: [roomImg4, roomImg1, roomImg2, roomImg3],
+    images: [
+      "https://images.unsplash.com/photo-1590490360182-c33d955e5bde?w=800",
+      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800",
+      "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800",
+      "https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=800",
+    ],
     isAvailable: true,
     createdAt: "2025-04-10T06:23:20.252Z",
     updatedAt: "2025-04-10T06:23:20.252Z",

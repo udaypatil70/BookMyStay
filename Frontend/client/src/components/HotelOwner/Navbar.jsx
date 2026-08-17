@@ -3,19 +3,19 @@ import { UserButton } from "@clerk/react";
 
 const Navbar = () => {
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-10 py-4 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-white/5 shadow-lg shadow-black/10">
+    <header className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-10 py-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border-b border-emerald-500/10 shadow-lg shadow-slate-900/20">
       <Link to="/" className="flex items-center gap-3 group">
         <div className="relative">
           <span className="text-xl font-playfair font-bold tracking-tight text-white">
-            BookMy<span className="text-blue-400">Stay</span>
+            BookMy<span className="text-emerald-400">Stay</span>
           </span>
-          <div className="absolute -inset-1 bg-white/10 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="absolute -inset-1 bg-emerald-400/10 rounded-lg blur opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         </div>
         <div className="hidden md:flex flex-col">
           <span className="text-lg font-semibold text-white tracking-wide">
             Owner Portal
           </span>
-          <span className="text-[10px] text-slate-500 uppercase tracking-[0.25em]">
+          <span className="text-[10px] text-emerald-300/60 uppercase tracking-[0.25em]">
             Manage your property
           </span>
         </div>
@@ -34,7 +34,7 @@ const Navbar = () => {
         <div className="h-5 w-px bg-white/10 hidden sm:block" />
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex flex-col items-end">
-            <span className="text-xs text-slate-400">Signed in as</span>
+            <span className="text-xs text-slate-500">Signed in as</span>
             <span className="text-sm text-white font-medium">Hotel Owner</span>
           </div>
           <UserButton />

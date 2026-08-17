@@ -91,20 +91,19 @@ const AdminContacts = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl md:text-3xl font-semibold text-slate-900">Contact Messages</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Contact Messages</h1>
         <p className="text-sm text-slate-500 mt-1">View and manage user inquiries and messages.</p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 bg-white rounded-xl p-1 shadow-sm border border-slate-100 w-fit">
+      <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               activeTab === tab.key
-                ? "bg-slate-900 text-white"
-                : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                ? "bg-white text-indigo-700 shadow-sm"
+                : "text-slate-500 hover:text-slate-700"
             }`}
           >
             {tab.label}
@@ -114,11 +113,11 @@ const AdminContacts = () => {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-[3px] border-indigo-500 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : contacts.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 py-16 text-center">
-          <p className="text-sm font-medium text-slate-600">No messages found.</p>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 py-16 text-center">
+          <p className="text-sm font-medium text-slate-500">No messages found.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -126,8 +125,8 @@ const AdminContacts = () => {
             <div
               key={contact._id}
               className={`bg-white rounded-2xl shadow-sm border transition-all ${
-                contact.isRead ? "border-slate-100" : "border-blue-200 bg-blue-50/30"
-              } ${expandedId === contact._id ? "ring-2 ring-blue-100" : ""}`}
+                contact.isRead ? "border-slate-200/60" : "border-indigo-200 bg-indigo-50/20"
+              } ${expandedId === contact._id ? "ring-2 ring-indigo-100" : ""}`}
             >
               <div
                 className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-slate-50/50 transition-colors rounded-2xl"
@@ -135,7 +134,7 @@ const AdminContacts = () => {
               >
                 <div className="flex items-center gap-3 min-w-0">
                   {!contact.isRead && (
-                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 shrink-0" />
                   )}
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
@@ -200,7 +199,7 @@ const AdminContacts = () => {
                       <button
                         onClick={(e) => { e.stopPropagation(); handleMarkRead(contact._id); }}
                         disabled={actionLoading === contact._id}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-all disabled:opacity-50"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-all disabled:opacity-50 shadow-sm"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
@@ -211,7 +210,7 @@ const AdminContacts = () => {
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDelete(contact._id); }}
                       disabled={actionLoading === contact._id}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 transition-all disabled:opacity-50"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 transition-all disabled:opacity-50"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -225,7 +224,7 @@ const AdminContacts = () => {
           ))}
 
           {pagination.pages > 1 && (
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 px-6 py-4 flex items-center justify-between">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 px-6 py-4 flex items-center justify-between">
               <p className="text-xs text-slate-400">
                 Page {pagination.page} of {pagination.pages} ({pagination.total} total)
               </p>

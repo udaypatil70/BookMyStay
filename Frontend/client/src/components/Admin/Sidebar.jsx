@@ -50,9 +50,9 @@ const AdminSidebar = () => {
   ];
 
   return (
-    <aside className="hidden md:flex flex-col w-64 lg:w-72 border-r border-slate-200/80 bg-white/50 backdrop-blur-sm">
-      <div className="px-6 py-5 border-b border-slate-100">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 font-semibold">
+    <aside className="hidden md:flex flex-col w-64 lg:w-72 border-r border-slate-200/60 bg-gradient-to-b from-slate-50 to-white">
+      <div className="px-6 py-5 border-b border-slate-200/60">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-indigo-400 font-semibold">
           Admin Navigation
         </p>
       </div>
@@ -66,19 +66,19 @@ const AdminSidebar = () => {
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group ${
                 isActive
-                  ? "bg-gradient-to-r from-blue-50 to-blue-100/50 text-blue-700 shadow-sm shadow-blue-100"
+                  ? "bg-indigo-50 text-indigo-700 shadow-sm shadow-indigo-100 ring-1 ring-indigo-100"
                   : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
               }`
             }
           >
             {({ isActive }) => (
               <>
-                <span className={`transition-transform duration-200 ${isActive ? "scale-110" : "group-hover:scale-105"}`}>
+                <span className={`transition-transform duration-200 ${isActive ? "scale-110 text-indigo-600" : "text-slate-400 group-hover:text-slate-600 group-hover:scale-105"}`}>
                   {item.icon}
                 </span>
                 <span>{item.name}</span>
                 {isActive && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-500" />
+                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-500" />
                 )}
               </>
             )}

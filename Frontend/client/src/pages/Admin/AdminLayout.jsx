@@ -36,8 +36,11 @@ const AdminLayout = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-slate-50">
-        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-slate-50 via-indigo-50/30 to-slate-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-[3px] border-indigo-500 border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-slate-400 font-medium">Loading admin panel...</p>
+        </div>
       </div>
     );
   }
@@ -45,7 +48,7 @@ const AdminLayout = () => {
   if (!isAdmin) return null;
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 via-indigo-50/20 to-slate-50">
       <Navbar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />

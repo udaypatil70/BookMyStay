@@ -16,7 +16,7 @@ const Layout = () => {
 
   if (hotelStatus === "pending" || hotelStatus === "rejected") {
     return (
-      <div className="flex flex-col h-screen bg-slate-50">
+      <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 via-emerald-50/20 to-slate-50">
         <Navbar />
         <PendingApproval />
       </div>
@@ -24,7 +24,7 @@ const Layout = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 via-emerald-50/20 to-slate-50">
       <Navbar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />

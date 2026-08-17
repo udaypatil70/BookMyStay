@@ -46,22 +46,22 @@ const AdminHotels = () => {
     switch (status) {
       case "active":
         return (
-          <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200">
+          <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/60">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             Active
           </span>
         );
       case "pending":
         return (
-          <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold bg-amber-50 text-amber-600 ring-1 ring-amber-200">
+          <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold bg-amber-50 text-amber-700 ring-1 ring-amber-200/60">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
             Pending
           </span>
         );
       case "rejected":
         return (
-          <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold bg-red-50 text-red-600 ring-1 ring-red-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+          <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold bg-rose-50 text-rose-700 ring-1 ring-rose-200/60">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
             Rejected
           </span>
         );
@@ -73,20 +73,19 @@ const AdminHotels = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl md:text-3xl font-semibold text-slate-900">All Hotels</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900">All Hotels</h1>
         <p className="text-sm text-slate-500 mt-1">View and manage all registered hotels.</p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 bg-white rounded-xl p-1 shadow-sm border border-slate-100 w-fit">
+      <div className="flex gap-1 bg-slate-100 rounded-xl p-1 w-fit">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               activeTab === tab.key
-                ? "bg-slate-900 text-white"
-                : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                ? "bg-white text-indigo-700 shadow-sm"
+                : "text-slate-500 hover:text-slate-700"
             }`}
           >
             {tab.label}
@@ -96,18 +95,18 @@ const AdminHotels = () => {
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-[3px] border-indigo-500 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : hotels.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 py-16 text-center">
-          <p className="text-sm font-medium text-slate-600">No hotels found.</p>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 py-16 text-center">
+          <p className="text-sm font-medium text-slate-500">No hotels found.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[700px]">
               <thead>
-                <tr className="border-b border-slate-100">
+                <tr className="border-b border-slate-100 bg-slate-50/50">
                   <th className="py-3 px-6 text-left text-xs font-semibold uppercase tracking-[0.1em] text-slate-400">Hotel</th>
                   <th className="py-3 px-6 text-left text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hidden md:table-cell">Owner</th>
                   <th className="py-3 px-6 text-left text-xs font-semibold uppercase tracking-[0.1em] text-slate-400 hidden md:table-cell">City</th>

@@ -1,13 +1,14 @@
-import heroImage from "../assets/heroImage.png";
 import SearchBar from "./SearchBar";
+
+const HERO_BG = "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=1920&q=80";
 
 const Hero = () => {
   return (
     <div
       className="relative flex flex-col items-start justify-center h-screen bg-cover bg-center bg-no-repeat text-white"
-      style={{ backgroundImage: `url(${heroImage})` }}
+      style={{ backgroundImage: `url(${HERO_BG})` }}
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/60" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/10 to-black/50" />
 
       <div className="relative z-10 flex flex-col items-center justify-center w-full px-4 -mt-16">
         <h1 className="font-playfair max-w-2xl text-center text-3xl font-bold leading-tight md:text-6xl md:leading-[70px] md:font-extrabold animate-fade-in-up mb-8">
