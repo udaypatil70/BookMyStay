@@ -17,6 +17,8 @@ import AdminLayout from "./pages/Admin/AdminLayout";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import PendingApprovals from "./pages/Admin/PendingApprovals";
 import AdminHotels from "./pages/Admin/AdminHotels";
+import AdminUsers from "./pages/Admin/AdminUsers";
+import AdminContacts from "./pages/Admin/AdminContacts";
 import {Toaster} from "react-hot-toast";
 import { useAppContext } from "./context/AppContext";
 
@@ -65,6 +67,8 @@ function App() {
             <Route index element={<AdminDashboard />} />
             <Route path="pending" element={<PendingApprovals />} />
             <Route path="hotels" element={<AdminHotels />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="contacts" element={<AdminContacts />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
