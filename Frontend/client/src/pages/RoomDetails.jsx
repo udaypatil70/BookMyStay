@@ -20,6 +20,7 @@ const RoomDetails = () => {
   );
   const [guests, setGuests] = useState(searchParams.get("guests") || 1);
   const [isAvailable, setIsAvailable] = useState(false);
+  const [paymentOption, setPaymentOption] = useState("Pay At Hotel");
 
   const [reviews, setReviews] = useState([]);
   const [totalReviews, setTotalReviews] = useState(0);
@@ -116,6 +117,12 @@ const RoomDetails = () => {
       if (!isAvailable) {
         return checkAvailability();
       } else {
+        if (!user) {
+          toast.error("Please login to book a room");
+          return;
+        }
+
+        // Create booking first
         const { data } = await axios.post(
           "/api/bookings/book",
           {
@@ -123,18 +130,100 @@ const RoomDetails = () => {
             checkInDate,
             checkOutDate,
             guests,
-            paymentMethod: "Pay At Hotel",
+            paymentOption,
           },
           {
             headers: { Authorization: `Bearer ${await getToken()}` },
           },
         );
-        if (data.success) {
+
+        if (!data.success) {
+          toast.error(data.message);
+          return;
+        }
+
+        // If online payment selected, initiate Razorpay
+        if (paymentOption === "50%" || paymentOption === "100%") {
+          const bookingId = data.booking._id;
+
+          const { data: razorpayData } = await axios.post(
+            "/api/bookings/create-razorpay-order",
+            { bookingId },
+            { headers: { Authorization: `Bearer ${await getToken()}` } },
+          );
+
+          if (!razorpayData.success) {
+            toast.success("Booking created. You can pay later from My Bookings.");
+            navigate("/my-bookings");
+            scrollTo(0, 0);
+            return;
+          }
+
+          // Load Razorpay script
+          const script = document.createElement("script");
+          script.src = "https://checkout.razorpay.com/v1/checkout.js";
+          script.onload = () => {
+            const options = {
+              key: razorpayData.keyId,
+              amount: razorpayData.amount * 100,
+              currency: razorpayData.currency,
+              name: "BookMyStay",
+              description: `Booking Payment (${paymentOption === "50%" ? "50%" : "100%"})`,
+              order_id: razorpayData.orderId,
+              handler: async function (response) {
+                try {
+                  const { data: verifyData } = await axios.post(
+                    "/api/bookings/verify-payment",
+                    {
+                      bookingId,
+                      razorpay_order_id: response.razorpay_order_id,
+                      razorpay_payment_id: response.razorpay_payment_id,
+                      razorpay_signature: response.razorpay_signature,
+                    },
+                    { headers: { Authorization: `Bearer ${await getToken()}` } },
+                  );
+
+                  if (verifyData.success) {
+                    toast.success("Payment successful! Booking confirmed.");
+                    navigate("/my-bookings");
+                    scrollTo(0, 0);
+                  } else {
+                    toast.error(verifyData.message);
+                  }
+                } catch {
+                  toast.error("Payment verification failed. Contact support.");
+                }
+              },
+              prefill: {
+                name: user?.username || "",
+                email: user?.email || "",
+              },
+              theme: { color: "#1a1a1a" },
+              modal: {
+                ondismiss: function () {
+                  toast("Payment cancelled. You can pay later from My Bookings.");
+                  navigate("/my-bookings");
+                  scrollTo(0, 0);
+                },
+              },
+            };
+
+            const rzp = new window.Razorpay(options);
+            rzp.on("payment.failed", function (response) {
+              toast.error(response.error?.description || "Payment failed");
+            });
+            rzp.open();
+          };
+          script.onerror = () => {
+            toast.success("Booking created. You can pay later from My Bookings.");
+            navigate("/my-bookings");
+            scrollTo(0, 0);
+          };
+          document.body.appendChild(script);
+        } else {
           toast.success(data.message);
           navigate("/my-bookings");
           scrollTo(0, 0);
-        } else {
-          toast.error(data.message);
         }
       }
     } catch (error) {
@@ -247,68 +336,127 @@ const RoomDetails = () => {
 
         <form
           onSubmit={onSubmitHandler}
-          className="flex flex-col md:flex-row items-start md:items-center justify-between bg-white rounded-2xl shadow-lg border border-slate-100 p-6 mx-auto mt-16 max-w-6xl animate-slide-in-bottom"
+          className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 mx-auto mt-16 max-w-6xl animate-slide-in-bottom"
         >
-          <div className="flex flex-col flex-wrap md:flex-row items-start md:items-center gap-4 md:gap-10">
-            <div className="flex flex-col">
-              <label htmlFor="checkInDate" className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Check-In
-              </label>
-              <input
-                onChange={(e) => setCheckInDate(e.target.value)}
-                value={checkInDate}
-                min={new Date().toISOString().split("T")[0]}
-                type="date"
-                id="checkInDate"
-                placeholder="check-In"
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 mt-1.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
-                required
-              />
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="flex flex-col flex-wrap md:flex-row items-start md:items-center gap-4 md:gap-10">
+              <div className="flex flex-col">
+                <label htmlFor="checkInDate" className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  Check-In
+                </label>
+                <input
+                  onChange={(e) => setCheckInDate(e.target.value)}
+                  value={checkInDate}
+                  min={new Date().toISOString().split("T")[0]}
+                  type="date"
+                  id="checkInDate"
+                  placeholder="check-In"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 mt-1.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                  required
+                />
+              </div>
+
+              <div className="w-px h-15 bg-slate-200 max-md:hidden"></div>
+
+              <div className="flex flex-col">
+                <label htmlFor="checkOutDate" className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  Check-Out
+                </label>
+                <input
+                  onChange={(e) => setCheckOutDate(e.target.value)}
+                  value={checkOutDate}
+                  min={checkInDate}
+                  disabled={!checkInDate}
+                  type="date"
+                  id="checkOutDate"
+                  placeholder="check-Out"
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 mt-1.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300 disabled:opacity-50"
+                  required
+                />
+              </div>
+
+              <div className="w-px h-15 bg-slate-200 max-md:hidden"></div>
+
+              <div className="flex flex-col">
+                <label htmlFor="guests" className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  Guests
+                </label>
+                <input
+                  onChange={(e) => setGuests(e.target.value)}
+                  value={guests}
+                  type="number"
+                  id="guests"
+                  placeholder="1"
+                  className="max-w-20 rounded-xl border border-slate-200 px-4 py-3 mt-1.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+                  required
+                />
+              </div>
             </div>
 
-            <div className="w-px h-15 bg-slate-200 max-md:hidden"></div>
-
-            <div className="flex flex-col">
-              <label htmlFor="checkOutDate" className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Check-Out
-              </label>
-              <input
-                onChange={(e) => setCheckOutDate(e.target.value)}
-                value={checkOutDate}
-                min={checkInDate}
-                disabled={!checkInDate}
-                type="date"
-                id="checkOutDate"
-                placeholder="check-Out"
-                className="w-full rounded-xl border border-slate-200 px-4 py-3 mt-1.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300 disabled:opacity-50"
-                required
-              />
-            </div>
-
-            <div className="w-px h-15 bg-slate-200 max-md:hidden"></div>
-
-            <div className="flex flex-col">
-              <label htmlFor="guests" className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Guests
-              </label>
-              <input
-                onChange={(e) => setGuests(e.target.value)}
-                value={guests}
-                type="number"
-                id="guests"
-                placeholder="1"
-                className="max-w-20 rounded-xl border border-slate-200 px-4 py-3 mt-1.5 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
-                required
-              />
-            </div>
+            <button
+              type="submit"
+              className="bg-slate-900 hover:bg-slate-800 active:scale-95 transition-all duration-300 text-white rounded-full max-md:w-full px-12 py-3 text-base cursor-pointer hover:shadow-lg btn-press"
+            >
+              {isAvailable ? "Book Now" : "Check Availability"}
+            </button>
           </div>
 
-          <button
-            type="submit"
-            className="bg-slate-900 hover:bg-slate-800 active:scale-95 transition-all duration-300 text-white rounded-full max-md:w-full max-md:mt-6 px-12 py-3 text-base cursor-pointer hover:shadow-lg btn-press"
-          >
-            {isAvailable ? "Book Now" : "Check Availability"}
-          </button>
+          {isAvailable && (
+            <div className="mt-6 pt-6 border-t border-slate-100 animate-fade-in-up">
+              <p className="text-sm font-medium text-slate-700 mb-3">Select Payment Option</p>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPaymentOption("50%")}
+                  className={`flex-1 min-w-[140px] px-5 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-300 ${
+                    paymentOption === "50%"
+                      ? "border-amber-500 bg-amber-50 text-amber-700"
+                      : "border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                  }`}
+                >
+                  <div className="text-left">
+                    <p>Pay 50% Now</p>
+                    <p className="text-xs mt-0.5 opacity-70">${room ? Math.ceil(room.pricePerNight * 0.5) : 0}/night</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentOption("100%")}
+                  className={`flex-1 min-w-[140px] px-5 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-300 ${
+                    paymentOption === "100%"
+                      ? "border-green-500 bg-green-50 text-green-700"
+                      : "border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                  }`}
+                >
+                  <div className="text-left">
+                    <p>Pay 100% Now</p>
+                    <p className="text-xs mt-0.5 opacity-70">${room ? room.pricePerNight : 0}/night</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentOption("Pay At Hotel")}
+                  className={`flex-1 min-w-[140px] px-5 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-300 ${
+                    paymentOption === "Pay At Hotel"
+                      ? "border-blue-500 bg-blue-50 text-blue-700"
+                      : "border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                  }`}
+                >
+                  <div className="text-left">
+                    <p>Pay at Hotel</p>
+                    <p className="text-xs mt-0.5 opacity-70">Pay when you check in</p>
+                  </div>
+                </button>
+              </div>
+              {paymentOption !== "Pay At Hotel" && (
+                <p className="mt-3 text-xs text-slate-500">
+                  {paymentOption === "50%"
+                    ? "You'll pay 50% now and the remaining 50% at check-in."
+                    : "Full payment will be charged now. You'll get instant confirmation."}
+                </p>
+              )}
+            </div>
+          )}
         </form>
 
         <div className="mt-25 space-y-4 stagger-children">

@@ -29,7 +29,7 @@ const Footer = () => {
           <p className="font-playfair text-lg font-semibold text-slate-200">COMPANY</p>
           <ul className="mt-4 flex flex-col gap-3 text-sm">
             <li>
-              <Link to="/about" className="transition-colors duration-300 hover:text-white">About</Link>
+              <Link to="/rooms" className="transition-colors duration-300 hover:text-white">Hotels</Link>
             </li>
             <li><span className="cursor-default">Careers</span></li>
             <li><span className="cursor-default">Press</span></li>

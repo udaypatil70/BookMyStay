@@ -71,7 +71,7 @@ const checkAvailabilityAPI = async (req, res) => {
 // POST /api/bookings/book
 const createBooking = async (req, res) => {
   try {
-    const { checkInDate, checkOutDate, room, guests, paymentMethod } = req.body;
+    const { checkInDate, checkOutDate, room, guests, paymentMethod, paymentOption } = req.body;
     const user = req.user._id;
 
     // Check room availability
@@ -107,8 +107,12 @@ const createBooking = async (req, res) => {
 
     const totalPrice = roomData.pricePerNight * nights;
 
-    // Determine initial status based on payment method
-    const isPaidByCard = paymentMethod === "Card" || paymentMethod === "UPI";
+    // Determine payment details based on option
+    const selectedOption = paymentOption || "Pay At Hotel";
+    const paidAmount = selectedOption === "100%" ? totalPrice
+      : selectedOption === "50%" ? Math.ceil(totalPrice * 0.5)
+      : 0;
+    const isPaidOnline = selectedOption === "100%" || selectedOption === "50%";
 
     const booking = await Booking.create({
       user,
@@ -118,9 +122,11 @@ const createBooking = async (req, res) => {
       checkOutDate,
       guests: +guests,
       totalPrice,
-      paymentMethod: paymentMethod || "Pay At Hotel",
-      status: isPaidByCard ? "confirmed" : "pending",
-      isPaid: false,
+      paidAmount,
+      paymentOption: selectedOption,
+      paymentMethod: isPaidOnline ? "Razorpay" : (paymentMethod || "Pay At Hotel"),
+      status: isPaidOnline ? "confirmed" : "pending",
+      isPaid: selectedOption === "100%",
     });
 
     // Send booking confirmation email
@@ -142,6 +148,8 @@ const createBooking = async (req, res) => {
       <li><strong>Guests:</strong> ${booking.guests}</li>
       <li><strong>Total Amount:</strong> ${process.env.CURRENCY || "$"}${booking.totalPrice}</li>
       <li><strong>Payment Method:</strong> ${booking.paymentMethod}</li>
+      <li><strong>Payment Option:</strong> ${booking.paymentOption || 'Pay At Hotel'}</li>
+      <li><strong>Amount Paid:</strong> ${process.env.CURRENCY || "$"}${booking.paidAmount || 0}</li>
       <li><strong>Status:</strong> ${booking.status}</li>
     </ul>
     <p>We look forward to welcoming you!</p>
@@ -336,7 +344,16 @@ const createRazorpayOrder = async (req, res) => {
     if (booking.isPaid) {
       return res.status(400).json({
         success: false,
-        message: "Booking is already paid",
+        message: "Booking is already fully paid",
+      });
+    }
+
+    // Calculate remaining amount to pay
+    const remainingAmount = booking.totalPrice - (booking.paidAmount || 0);
+    if (remainingAmount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No pending amount for this booking",
       });
     }
 
@@ -348,7 +365,7 @@ const createRazorpayOrder = async (req, res) => {
     }
 
     const order = await getRazorpay().orders.create({
-      amount: Math.round(booking.totalPrice * 100), // Razorpay expects amount in paise
+      amount: Math.round(remainingAmount * 100), // Razorpay expects amount in paise
       currency: "INR",
       receipt: `booking_${booking._id}`,
       notes: {
@@ -361,7 +378,7 @@ const createRazorpayOrder = async (req, res) => {
     return res.status(200).json({
       success: true,
       orderId: order.id,
-      amount: booking.totalPrice,
+      amount: remainingAmount,
       currency: "INR",
       keyId: process.env.RAZORPAY_KEY_ID,
     });
@@ -394,10 +411,14 @@ const verifyRazorpayPayment = async (req, res) => {
       });
     }
 
-    // Update booking
+    // Get original booking before update
+    const originalBooking = await Booking.findById(bookingId).populate("room hotel");
+
+    // Update booking - mark as fully paid
     const booking = await Booking.findByIdAndUpdate(
       bookingId,
       {
+        paidAmount: originalBooking.totalPrice,
         isPaid: true,
         status: "confirmed",
         paymentMethod: "Razorpay",
@@ -427,7 +448,8 @@ const verifyRazorpayPayment = async (req, res) => {
           <ul>
             <li><strong>Booking ID:</strong> ${booking._id}</li>
             <li><strong>Hotel:</strong> ${booking.hotel.name}</li>
-            <li><strong>Amount Paid:</strong> ${process.env.CURRENCY || "₹"}${booking.totalPrice}</li>
+            <li><strong>Amount Paid:</strong> ${process.env.CURRENCY || "₹"}${booking.paidAmount}</li>
+            <li><strong>Total Amount:</strong> ${process.env.CURRENCY || "₹"}${booking.totalPrice}</li>
             <li><strong>Payment ID:</strong> ${razorpay_payment_id}</li>
             <li><strong>Status:</strong> Confirmed</li>
           </ul>
@@ -470,12 +492,12 @@ const getOwnerStats = async (req, res) => {
     const activeBookings = bookings.filter((b) => b.status !== "cancelled");
 
     const totalRevenue = activeBookings
-      .filter((b) => b.isPaid)
-      .reduce((acc, b) => acc + b.totalPrice, 0);
+      .filter((b) => b.isPaid || b.paidAmount > 0)
+      .reduce((acc, b) => acc + (b.paidAmount || b.totalPrice), 0);
 
     const pendingRevenue = activeBookings
       .filter((b) => !b.isPaid && b.status !== "cancelled")
-      .reduce((acc, b) => acc + b.totalPrice, 0);
+      .reduce((acc, b) => acc + (b.totalPrice - (b.paidAmount || 0)), 0);
 
     const pendingBookings = activeBookings.filter((b) => b.status === "pending").length;
     const confirmedBookings = activeBookings.filter((b) => b.status === "confirmed").length;

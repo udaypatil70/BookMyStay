@@ -227,7 +227,7 @@ const getOwnerHotel = async (req, res) => {
             _id: null,
             totalBookings: { $sum: 1 },
             totalRevenue: {
-              $sum: { $cond: ["$isPaid", "$totalPrice", 0] },
+              $sum: { $cond: [{ $gt: ["$paidAmount", 0] }, "$paidAmount", { $cond: ["$isPaid", "$totalPrice", 0] }] },
             },
             pendingBookings: {
               $sum: { $cond: [{ $eq: ["$status", "pending"] }, 1, 0] },

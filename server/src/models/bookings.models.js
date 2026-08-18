@@ -42,12 +42,22 @@ const bookingSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["Pay At Hotel", "Card", "UPI"],
+      enum: ["Pay At Hotel", "Card", "UPI", "Razorpay"],
       default: "Pay At Hotel",
     },
     isPaid: {
       type: Boolean,
       default: false,
+    },
+    paidAmount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    paymentOption: {
+      type: String,
+      enum: ["50%", "100%", "Pay At Hotel"],
+      default: "Pay At Hotel",
     },
   },
   {

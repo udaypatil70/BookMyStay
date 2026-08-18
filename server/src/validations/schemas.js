@@ -61,25 +61,6 @@ export const toggleAvailabilitySchema = {
   },
 };
 
-export const searchRoomsSchema = {
-  query: (data) => {
-    const errors = {};
-    if (data.priceMin && (isNaN(Number(data.priceMin)) || Number(data.priceMin) < 0)) {
-      errors.priceMin = "Minimum price must be a positive number";
-    }
-    if (data.priceMax && (isNaN(Number(data.priceMax)) || Number(data.priceMax) < 0)) {
-      errors.priceMax = "Maximum price must be a positive number";
-    }
-    if (data.priceMin && data.priceMax && Number(data.priceMin) > Number(data.priceMax)) {
-      errors.priceMax = "Maximum price must be greater than minimum price";
-    }
-    if (data.page && (isNaN(Number(data.page)) || Number(data.page) < 1)) {
-      errors.page = "Page must be a positive number";
-    }
-    return Object.keys(errors).length > 0 ? errors : null;
-  },
-};
-
 export const updateProfileSchema = {
   body: (data) => {
     const errors = {};
@@ -174,6 +155,10 @@ export const createBookingSchema = {
     const validPaymentMethods = ["Pay At Hotel", "Card", "UPI", "Razorpay"];
     if (data.paymentMethod && !validPaymentMethods.includes(data.paymentMethod)) {
       errors.paymentMethod = `Payment method must be one of: ${validPaymentMethods.join(", ")}`;
+    }
+    const validPaymentOptions = ["50%", "100%", "Pay At Hotel"];
+    if (data.paymentOption && !validPaymentOptions.includes(data.paymentOption)) {
+      errors.paymentOption = `Payment option must be one of: ${validPaymentOptions.join(", ")}`;
     }
     if (data.checkInDate && data.checkOutDate) {
       if (new Date(data.checkOutDate) <= new Date(data.checkInDate)) {

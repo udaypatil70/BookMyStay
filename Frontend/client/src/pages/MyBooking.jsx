@@ -157,16 +157,17 @@ const MyBooking = () => {
     }
   }, [user]);
 
-  const getStatusColor = (status, isPaid) => {
+  const getStatusColor = (status, isPaid, paidAmount, totalPrice) => {
     if (status === "cancelled") return "bg-red-100 text-red-600";
-    if (status === "confirmed" || isPaid) return "bg-green-100 text-green-600";
+    if (isPaid) return "bg-green-100 text-green-600";
+    if (paidAmount > 0) return "bg-blue-100 text-blue-600";
     return "bg-amber-100 text-amber-600";
   };
 
-  const getStatusLabel = (status, isPaid) => {
+  const getStatusLabel = (status, isPaid, paidAmount, totalPrice) => {
     if (status === "cancelled") return "Cancelled";
-    if (status === "confirmed") return "Confirmed";
     if (isPaid) return "Paid";
+    if (paidAmount > 0) return `Partial (${Math.round((paidAmount / totalPrice) * 100)}%)`;
     return "Pending";
   };
 
@@ -178,7 +179,7 @@ const MyBooking = () => {
   };
 
   const canPay = (booking) => {
-    return !booking.isPaid && booking.status !== "cancelled";
+    return booking.paidAmount < booking.totalPrice && booking.status !== "cancelled";
   };
 
   return (
@@ -274,7 +275,15 @@ const MyBooking = () => {
                     <span>{booking.guests} Guest{booking.guests > 1 ? "s" : ""}</span>
                   </div>
                   <p className="text-base text-slate-700">
-                    Total: {currency}{booking.totalPrice}
+                    {booking.paidAmount > 0 && !booking.isPaid ? (
+                      <>
+                        <span className="line-through text-slate-400 mr-1">{currency}{booking.totalPrice}</span>
+                        <span className="text-blue-600 font-semibold">{currency}{booking.totalPrice - booking.paidAmount}</span>
+                        <span className="text-xs text-slate-400 ml-1">remaining</span>
+                      </>
+                    ) : (
+                      <>Total: {currency}{booking.totalPrice}</>
+                    )}
                   </p>
                 </div>
               </div>
@@ -297,9 +306,9 @@ const MyBooking = () => {
 
               <div className="flex flex-col items-start justify-center pt-3">
                 <span
-                  className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold transition-all duration-300 ${getStatusColor(booking.status, booking.isPaid)}`}
+                  className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold transition-all duration-300 ${getStatusColor(booking.status, booking.isPaid, booking.paidAmount, booking.totalPrice)}`}
                 >
-                  {getStatusLabel(booking.status, booking.isPaid)}
+                  {getStatusLabel(booking.status, booking.isPaid, booking.paidAmount, booking.totalPrice)}
                 </span>
                 <p className="text-xs text-slate-400 mt-1">
                   {booking.paymentMethod}
@@ -312,7 +321,7 @@ const MyBooking = () => {
                     onClick={() => handlePayment(booking._id)}
                     className="px-4 py-1.5 text-xs bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-blue-500/30 btn-press"
                   >
-                    Pay Now
+                    {booking.paidAmount > 0 ? "Pay Remaining" : "Pay Now"}
                   </button>
                 )}
                 {canCancel(booking) && (

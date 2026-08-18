@@ -45,12 +45,12 @@ const getAdminStats = async (req, res) => {
 
     // Revenue stats
     const revenueData = await Booking.aggregate([
-      { $match: { isPaid: true, status: { $ne: "cancelled" } } },
+      { $match: { $or: [{ isPaid: true }, { paidAmount: { $gt: 0 } }], status: { $ne: "cancelled" } } },
       {
         $group: {
           _id: null,
-          totalRevenue: { $sum: "$totalPrice" },
-          avgBookingValue: { $avg: "$totalPrice" },
+          totalRevenue: { $sum: { $cond: [{ $gt: ["$paidAmount", 0] }, "$paidAmount", "$totalPrice"] } },
+          avgBookingValue: { $avg: { $cond: [{ $gt: ["$paidAmount", 0] }, "$paidAmount", "$totalPrice"] } },
         },
       },
     ]);
@@ -70,7 +70,7 @@ const getAdminStats = async (req, res) => {
           count: { $sum: 1 },
           revenue: {
             $sum: {
-              $cond: [{ $eq: ["$isPaid", true] }, "$totalPrice", 0],
+              $cond: [{ $gt: ["$paidAmount", 0] }, "$paidAmount", { $cond: [{ $eq: ["$isPaid", true] }, "$totalPrice", 0] }],
             },
           },
         },
